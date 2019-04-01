@@ -34,10 +34,4 @@ class Command(BaseCommand):
 
         app.store_page_html = r.content
         app.store_page_retrieved_on = timezone.now()
-
-        soup = BeautifulSoup(r.content, 'lxml')
-
-        for tag_element in soup.select(self.tag_selector):
-            tag, _ = Tag.objects.get_or_create(
-                id=tag_element['data-tagid'],
-            )
+        app.save()
