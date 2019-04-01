@@ -1,7 +1,10 @@
+import time
+
 import requests
 from bs4 import BeautifulSoup
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from tqdm import tqdm
 
 from steamtail.models import App, Tag
 from steamtail.utils import Limiter
@@ -9,7 +12,7 @@ from steamtail.utils import Limiter
 
 class Command(BaseCommand):
     help = 'Loads tag info from Steam.'
-    url = 'http://store.steampowered.com/app/{}/'
+    url = 'https://store.steampowered.com/app/{}/'
     tag_selector = '#app_tagging_modal .app_tag_control'
 
     def handle(self, *args, **options):
