@@ -59,4 +59,4 @@ def get_app_tags(app_id):
         match = app_tags_pattern.search(script.text)
         if match:
             return store_page_html, json.loads(match.group())
-    return store_page_html, []
+    return None, []
