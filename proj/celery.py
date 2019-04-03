@@ -11,5 +11,4 @@ app.autodiscover_tasks()
 
 @app.on_after_configure.connect
 def init_periodic_task(sender, **kwargs):
-    from steamtail.tasks import update_apps
-    update_apps.delay()
+    sender.send_task('steamtail.tasks.update_apps')
