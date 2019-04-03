@@ -62,7 +62,8 @@ def update_app(app_id, refresh=True):
 
 
 def update_app_tags(app):
-    for store_page_html, tag_info in steam.get_app_tags(app.id):
+    store_page_html, tags = steam.get_app_tags(app.id)
+    for tag_info in tags:
         tag, __ = Tag.objects.get_or_create(
             id=tag_info['tagid'],
             defaults=dict(
@@ -77,5 +78,5 @@ def update_app_tags(app):
                 browseable=tag_info.get('browseable'),
             ),
         )
-        app.store_page_html = store_page_html
-        app.save()
+    app.store_page_html = store_page_html
+    app.save()
