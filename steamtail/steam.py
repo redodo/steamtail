@@ -39,7 +39,7 @@ def get_store_page(app_id):
     r = requests.get(url)
     r.raise_for_status()
     if not r.url.startswith(url):
-        return ''
+        return b''
     return r.content
 
 
