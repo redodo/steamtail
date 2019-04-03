@@ -37,6 +37,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(App)
 class AppAdmin(admin.ModelAdmin):
+    change_list_template = 'steamtail/admin/app_change_list.html'
     search_fields = [
         'id',
         'name',
