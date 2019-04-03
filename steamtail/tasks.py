@@ -7,7 +7,7 @@ from django.db.models import Q
 
 from . import steam
 from .models import App, AppTag, Tag
-from .utils import init_apps
+from .utils import init_apps, update_app_tags
 
 
 @shared_task
@@ -59,24 +59,3 @@ def update_app(app_id, refresh=True):
     app.save()
 
     return app_info
-
-
-def update_app_tags(app):
-    raw_store_page, tags = steam.get_app_tags(app.id)
-    for tag_info in tags:
-        tag, __ = Tag.objects.get_or_create(
-            id=tag_info['tagid'],
-            defaults=dict(
-                name=tag_info['name'],
-            )
-        )
-        AppTag.objects.update_or_create(
-            app=app,
-            tag=tag,
-            defaults=dict(
-                votes=tag_info['count'],
-                browseable=tag_info.get('browseable'),
-            ),
-        )
-    app.raw_store_page = raw_store_page
-    app.save()

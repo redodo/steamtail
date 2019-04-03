@@ -121,3 +121,54 @@ class AppTag(models.Model):
         _('browseable'),
         null=True,
     )
+
+    class Meta:
+        unique_together = ('app', 'tag')
+
+
+class User(models.Model):
+    id = models.BigIntegerField(
+        _('steam64 id'),
+        primary_key=True,
+        editable=False,
+    )
+    apps = models.ManyToManyField(
+        App,
+        through='UserApp',
+        related_name='users',
+        verbose_name=_('apps'),
+    )
+
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+
+    def __str__(self):
+        return self.id
+
+    def get_absolute_url(self):
+        return 'https://steamcommunity.com/profiles/{}'.format(self.id)
+
+
+class UserApp(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+    )
+    app = models.ForeignKey(
+        App,
+        on_delete=models.CASCADE,
+    )
+    hours_played = models.DecimalField(
+        _('hours played'),
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+    )
+    last_played = models.DateTimeField(
+        _('last played'),
+        null=True,
+    )
+
+    class Meta:
+        unique_together = ('user', 'app')

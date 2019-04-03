@@ -19,3 +19,24 @@ def init_apps():
                 new_apps.append(app)
 
         App.objects.bulk_create(new_apps)
+
+
+def update_app_tags(app):
+    raw_store_page, tags = steam.get_app_tags(app.id)
+    for tag_info in tags:
+        tag, __ = Tag.objects.get_or_create(
+            id=tag_info['tagid'],
+            defaults=dict(
+                name=tag_info['name'],
+            )
+        )
+        AppTag.objects.update_or_create(
+            app=app,
+            tag=tag,
+            defaults=dict(
+                votes=tag_info['count'],
+                browseable=tag_info.get('browseable'),
+            ),
+        )
+    app.raw_store_page = raw_store_page
+    app.save()
