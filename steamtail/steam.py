@@ -58,5 +58,5 @@ def get_app_tags(app_id):
     for script in soup.select('script:not([src])'):
         match = app_tags_pattern.search(script.text)
         if match:
-            return json.loads(match.group())
-    return []
+            return store_page_html, json.loads(match.group())
+    return store_page_html, []
