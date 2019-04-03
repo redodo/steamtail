@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -8,20 +9,6 @@ class App(models.Model):
         primary_key=True,
         editable=False,
     )
-    type = models.CharField(
-        _('app type'),
-        max_length=32,
-        blank=True,
-        null=True,
-    )
-    name = models.TextField(
-        _('app name'),
-    )
-    info = models.BinaryField(
-        _('raw app info'),
-        blank=True,
-        null=True,
-    )
     created_on = models.DateTimeField(
         _('created on'),
         auto_now_add=True,
@@ -30,31 +17,55 @@ class App(models.Model):
         _('modified on'),
         auto_now=True,
     )
+    type = models.CharField(
+        _('app type'),
+        max_length=32,
+        null=True,
+    )
+    name = models.TextField(
+        _('app name'),
+    )
+    short_description = models.TextField(
+        _('short description'),
+        null=True,
+    )
     parent = models.ForeignKey(
         'App',
         verbose_name=_('parent app'),
         on_delete=models.SET_NULL,
-        blank=True,
+        null=True,
+    )
+    is_free = models.BooleanField(
+        _('is free'),
+        null=True,
+    )
+    coming_soon = models.BooleanField(
+        _('coming soon'),
         null=True,
     )
     release_date = models.DateField(
         _('release date'),
-        blank=True,
         null=True,
     )
     tags = models.ManyToManyField(
         'Tag',
+        through='AppTag',
         related_name='apps',
         verbose_name=_('tags'),
     )
-    store_page_html = models.BinaryField(
-        _('store page html'),
-        blank=True,
+
+    unknown = models.BooleanField(
+        _('unknown'),
+        null=True,  # default is unknown
+    )
+
+    # Raw unprocessed data gathered from Steam.
+    raw_info = JSONField(
+        _('raw app info'),
         null=True,
     )
-    store_page_retrieved_on = models.DateTimeField(
-        _('store page retrieved on'),
-        blank=True,
+    raw_store_page = models.BinaryField(
+        _('raw store page'),
         null=True,
     )
 
@@ -72,7 +83,7 @@ class App(models.Model):
 
 class Tag(models.Model):
     id = models.BigIntegerField(
-        _('ID'),
+        _('tag ID'),
         primary_key=True,
         editable=False,
     )
@@ -82,7 +93,7 @@ class Tag(models.Model):
     )
 
     class Meta:
-        ordering = ['id', 'name']
+        ordering = ['name']
         verbose_name = _('tag')
         verbose_name_plural = _('tags')
 
@@ -91,3 +102,22 @@ class Tag(models.Model):
 
     def get_absolute_url(self):
         return 'https://store.steampowered.com/tags/en/{}/'.format(self.name)
+
+
+class AppTag(models.Model):
+    """Records a tag to an app with number of votes"""
+    app = models.ForeignKey(
+        App,
+        on_delete=models.CASCADE,
+    )
+    tag = models.ForeignKey(
+        Tag,
+        on_delete=models.CASCADE,
+    )
+    votes = models.PositiveIntegerField(
+        _('votes'),
+    )
+    browseable = models.BooleanField(
+        _('browseable'),
+        null=True,
+    )

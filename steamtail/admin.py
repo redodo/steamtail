@@ -1,6 +1,9 @@
 from django.contrib import admin
+from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 
-from .models import App
+from .models import App, Tag
+from .tasks import update_app
 
 
 class AppInline(admin.TabularInline):
@@ -11,6 +14,25 @@ class AppInline(admin.TabularInline):
 
     def get_readonly_fields(self, request, obj=None):
         return self.get_fields(request, obj=obj)
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    search_fields = [
+        'name',
+    ]
+    list_display = [
+        'id',
+        'name',
+    ]
+    list_display_links = [
+        'id',
+        'name',
+    ]
+    readonly_fields = [
+        'id',
+        'name',
+    ]
 
 
 @admin.register(App)
@@ -26,6 +48,7 @@ class AppAdmin(admin.ModelAdmin):
         'id',
         'name',
         'type',
+        'unknown',
         'release_date',
         'modified_on',
     ]
@@ -33,17 +56,52 @@ class AppAdmin(admin.ModelAdmin):
         'id',
         'name',
     ]
-    list_filter = ['type']
+    list_filter = [
+        'type',
+        'unknown',
+        'is_free',
+        'coming_soon',
+        'tags',
+    ]
     readonly_fields = [
         'id',
         'type',
         'name',
+        'unknown',
         'parent',
+        'coming_soon',
         'release_date',
         'tags',
-        'info',
-        'store_page_html',
-        'store_page_retrieved_on',
+        'short_description',
+        'is_free',
+        'raw_info',
+        'raw_store_page',
     ]
     inlines = [AppInline]
     date_hierarchy = 'release_date'
+    actions = [
+        'soft_update_apps',
+        'update_pending_apps',
+        'update_apps',
+    ]
+
+    def soft_update_apps(self, request, queryset):
+        for app in queryset.filter(unknown=False):
+            update_app.delay(app.id, refresh=False)
+    soft_update_apps.short_description = _(
+        'Soft update selected apps'
+    )
+
+    def update_pending_apps(self, request, queryset):
+        for app in queryset.filter(unknown=None):
+            update_app.delay(app.id)
+    update_pending_apps.short_description = _(
+        'Update pending selected apps'
+    )
+
+    def update_apps(self, request, queryset):
+        for app in queryset:
+            update_app.delay(app.id, refresh=True)
+    update_apps.short_description = _(
+        'Force update selected apps'
+    )

@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+
+    mq:
+        image: rabbitmq:3-management
+        volumes:
+            - mq-data:/var/lib/rabbitmq
+        ports:
+            - "8002:15672"
+        restart: on-failure
+
+    db:
+        image: postgres
+        volumes:
+            - db-data:/var/lib/postgresql/data
+        restart: on-failure
+
+    web:
+        build: .
+        entrypoint: python manage.py
+        command: runserver 0.0.0.0:8000
+        volumes:
+            - .:/app
+        ports:
+            - "8000:8000"
+        depends_on:
+            - db
+            - mq
+        restart: on-failure
+
+    worker:
+        build: .
+        entrypoint: celery -A proj worker
+        command: -l info
+        volumes:
+            - .:/app
+        depends_on:
+            - mq
+        restart: on-failure
+
+    scheduler:
+        build: .
+        entrypoint: celery -A proj beat
+        command: -l debug
+        volumes:
+            - .:/app
+        depends_on:
+            - mq
+        restart: on-failure
+
+volumes:
+    db-data:
+    mq-data:
