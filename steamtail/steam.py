@@ -35,9 +35,12 @@ def get_app_info(app_id):
 
 
 def get_store_page(app_id):
-    url = STORE_PAGE_URL.format(app_id)
-    r = requests.get(url)
-    r.raise_for_status()
+    try:
+        url = STORE_PAGE_URL.format(app_id)
+        r = requests.get(url)
+        r.raise_for_status()
+    except requests.TooManyRedirects:
+        return b''
     if not r.url.startswith(url):
         return b''
     return r.content
