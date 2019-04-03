@@ -8,13 +8,13 @@ services:
             - mq-data:/var/lib/rabbitmq
         ports:
             - "8002:15672"
-        restart: on-failure
+        restart: unless-stopped
 
     db:
         image: postgres
         volumes:
             - db-data:/var/lib/postgresql/data
-        restart: on-failure
+        restart: unless-stopped
 
     web:
         build: .
@@ -27,7 +27,7 @@ services:
         depends_on:
             - db
             - mq
-        restart: on-failure
+        restart: unless-stopped
 
     worker:
         build: .
@@ -37,7 +37,7 @@ services:
             - .:/app
         depends_on:
             - mq
-        restart: on-failure
+        restart: unless-stopped
 
     scheduler:
         build: .
@@ -47,7 +47,7 @@ services:
             - .:/app
         depends_on:
             - mq
-        restart: on-failure
+        restart: unless-stopped
 
 volumes:
     db-data:
