@@ -42,9 +42,9 @@ def get_store_page(app_id):
         r = session.get(url)
         r.raise_for_status()
     except requests.TooManyRedirects:
-        return b''
+        return None
     if not r.url.startswith(url):
-        return b''
+        return None
     return r.content
 
 
@@ -53,10 +53,12 @@ app_tags_pattern = re.compile(r'\[{.*?"tagid".*?}\]')
 
 def get_app_tags(app_id):
     store_page_html = get_store_page(app_id)
-    soup = BeautifulSoup(store_page_html, 'lxml')
 
-    for script in soup.select('script:not([src])'):
-        match = app_tags_pattern.search(script.text)
-        if match:
-            return store_page_html, json.loads(match.group())
+    if store_page_html is not None:
+        soup = BeautifulSoup(store_page_html, 'lxml')
+
+        for script in soup.select('script:not([src])'):
+            match = app_tags_pattern.search(script.text)
+            if match:
+                return store_page_html, json.loads(match.group())
     return None, []
