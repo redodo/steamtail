@@ -1,6 +1,6 @@
 {% extends "admin/change_list.html" %}
 {% load steamtail %}
 {% block object-tools %}
-<progress value="{% apps_done_count cl.root_queryset %}" max="{{ cl.result_count }}"></progress>
+<progress style="width:100%" value="{% apps_done_count cl.root_queryset %}" max="{{ cl.result_count }}"></progress>
 {{ block.super }}
 {% endblock %}
