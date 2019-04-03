@@ -3,11 +3,9 @@ version: "3"
 services:
 
     mq:
-        image: rabbitmq:3-management
+        image: rabbitmq
         volumes:
             - mq-data:/var/lib/rabbitmq
-        ports:
-            - "8002:15672"
         restart: unless-stopped
 
     db:
@@ -19,7 +17,7 @@ services:
     web:
         build: .
         entrypoint: python manage.py
-        command: runserver 0.0.0.0:8000
+        command: runserver 0.0.0.0:8814
         volumes:
             - .:/app
         ports:
