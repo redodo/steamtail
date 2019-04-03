@@ -21,7 +21,7 @@ services:
         volumes:
             - .:/app
         ports:
-            - "8000:8000"
+            - "8814:8814"
         depends_on:
             - db
             - mq
