@@ -43,6 +43,8 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 86400,
     },
 }
+CELERY_WORKER_CONCURRENCY = 1
+CELERY_MAX_TASKS_PER_CHILD = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
