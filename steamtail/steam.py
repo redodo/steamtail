@@ -35,9 +35,11 @@ def get_app_info(app_id):
 
 
 def get_store_page(app_id):
+    session = requests.session()
+    session.max_redirects = 5
     try:
         url = STORE_PAGE_URL.format(app_id)
-        r = requests.get(url)
+        r = session.get(url)
         r.raise_for_status()
     except requests.TooManyRedirects:
         return b''
