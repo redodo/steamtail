@@ -54,3 +54,4 @@ def get_app_tags(app_id):
         match = app_tags_pattern.search(script.text)
         if match:
             return json.loads(match.group())
+    return []
