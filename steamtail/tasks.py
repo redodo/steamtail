@@ -78,5 +78,5 @@ def update_app_tags(app):
                 browseable=tag_info.get('browseable'),
             ),
         )
-    app.store_page_html = store_page_html
+    app.raw_store_page = store_page_html
     app.save()
