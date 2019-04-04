@@ -1,7 +1,7 @@
 from django.db import transaction
 
 from . import steam
-from .models import App
+from .models import App, AppTag, Tag
 
 
 def init_apps():
