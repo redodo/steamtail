@@ -37,12 +37,12 @@ INSTALLED_APPS = [
 # Celery config
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html
 CELERY_BROKER_URL = 'amqp://guest:guest@mq//'
-CELERY_BEAT_SCHEDULE = {
-    'update_apps': {
-        'task': 'steamtail.tasks.update_apps',
-        'schedule': 86400,
-    },
-}
+#CELERY_BEAT_SCHEDULE = {
+#    'update_apps': {
+#        'task': 'steamtail.tasks.update_apps',
+#        'schedule': 86400,
+#    },
+#}
 CELERY_WORKER_CONCURRENCY = 1
 CELERY_MAX_TASKS_PER_CHILD = 1
 CELERY_ACKS_LATE = True

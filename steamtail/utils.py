@@ -6,15 +6,11 @@ from .models import App
 
 def init_apps():
     with transaction.atomic():
-        apps = {
-            app.id: app
-            for app in App.objects.all()
-        }
+        apps = set(App.objects.values_list('id', flat=True))
         new_apps = []
 
         for app_id, name in steam.get_apps():
-            app = apps.get(app_id)
-            if not app:
+            if app_id not in apps:
                 app = App(id=app_id, name=name)
                 new_apps.append(app)
 
