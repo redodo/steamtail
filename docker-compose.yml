@@ -9,8 +9,9 @@ services:
         restart: unless-stopped
         deploy:
             replicas: 1
-            constraints:
-                - node.role == manager
+            placement:
+                constraints:
+                    - node.role == manager
 
     redis:
         image: redis
@@ -19,8 +20,9 @@ services:
         restart: unless-stopped
         deploy:
             replicas: 1
-            constraints:
-                - node.role == manager
+            placement:
+                constraints:
+                    - node.role == manager
 
     db:
         image: postgres
@@ -29,8 +31,9 @@ services:
         restart: unless-stopped
         deploy:
             replicas: 1
-            constraints:
-                - node.role == manager
+            placement:
+                constraints:
+                    - node.role == manager
 
     web:
         image: localhost:5000/steamtail
@@ -46,8 +49,9 @@ services:
         restart: unless-stopped
         deploy:
             replicas: 1
-            constraints:
-                - node.role == manager
+            placement:
+                constraints:
+                    - node.role == manager
 
     # The steamworker only and exclusively processes Steam requests
     # to mitigate and scale rate limits. It does not require database
@@ -82,8 +86,9 @@ services:
         restart: unless-stopped
         deploy:
             replicas: 1
-            constraints:
-                - node.role == manager
+            placement:
+                constraints:
+                    - node.role == manager
 
 volumes:
     db-data:
