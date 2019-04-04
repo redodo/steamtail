@@ -54,7 +54,6 @@ def update_app(app_id, refresh=True):
                         '%s with release date %s' %
                         (e.args[0], app_info['release_date']['date']),
                     )
-                    raise e
 
     app.save()
 
