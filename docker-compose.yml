@@ -19,7 +19,7 @@ services:
         restart: unless-stopped
         deploy:
             replicas: 1
-            contstraints:
+            constraints:
                 - node.role == manager
 
     db:
