@@ -7,21 +7,33 @@ services:
         volumes:
             - mq-data:/var/lib/rabbitmq
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            constraints:
+                - node.role == manager
 
     redis:
         image: redis
         volumes:
             - redis-data:/data
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            contstraints:
+                - node.role == manager
 
     db:
         image: postgres
         volumes:
             - db-data:/var/lib/postgresql/data
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            constraints:
+                - node.role == manager
 
     web:
-        build: .
+        image: localhost:5000/steamtail
         entrypoint: python manage.py
         command: runserver 0.0.0.0:8814
         volumes:
@@ -32,12 +44,16 @@ services:
             - db
             - mq
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            constraints:
+                - node.role == manager
 
     # The steamworker only and exclusively processes Steam requests
     # to mitigate and scale rate limits. It does not require database
     # access.
     steamworker:
-        build: .
+        image: localhost:5000/steamtail
         entrypoint: celery -A proj worker -Q steamworker
         command: -l info
         volumes:
@@ -48,10 +64,13 @@ services:
         restart: unless-stopped
         environment:
             DJANGO_SETTINGS_MODULE: proj.settings.steamworker
+        deploy:
+            mode: global
 
     # The default worker processes all other tasks.
     worker:
-        build: .
+        image: localhost:5000/steamtail
+        entrypoint: celery -A proj worker -Q steamworker
         entrypoint: celery -A proj worker
         command: -l info
         volumes:
@@ -61,6 +80,10 @@ services:
             - mq
             - redis
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            constraints:
+                - node.role == manager
 
 volumes:
     db-data:
