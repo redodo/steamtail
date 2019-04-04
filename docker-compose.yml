@@ -8,6 +8,12 @@ services:
             - mq-data:/var/lib/rabbitmq
         restart: unless-stopped
 
+    redis:
+        image: redis
+        volumes:
+            - redis-data:/data
+        restart: unless-stopped
+
     db:
         image: postgres
         volumes:
@@ -27,6 +33,23 @@ services:
             - mq
         restart: unless-stopped
 
+    # The steamworker only and exclusively processes Steam requests
+    # to mitigate and scale rate limits. It does not require database
+    # access.
+    steamworker:
+        build: .
+        entrypoint: celery -A proj worker -Q steamworker
+        command: -l info
+        volumes:
+            - .:/app
+        depends_on:
+            - mq
+            - redis
+        restart: unless-stopped
+        environment:
+            DJANGO_SETTINGS_MODULE: proj.settings.steamworker
+
+    # The default worker processes all other tasks.
     worker:
         build: .
         entrypoint: celery -A proj worker
@@ -34,19 +57,12 @@ services:
         volumes:
             - .:/app
         depends_on:
+            - db
             - mq
-        restart: unless-stopped
-
-    scheduler:
-        build: .
-        entrypoint: celery -A proj beat
-        command: -l debug
-        volumes:
-            - .:/app
-        depends_on:
-            - mq
+            - redis
         restart: unless-stopped
 
 volumes:
     db-data:
     mq-data:
+    redis-data:

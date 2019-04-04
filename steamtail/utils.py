@@ -1,3 +1,7 @@
+import json
+import re
+
+from bs4 import BeautifulSoup
 from django.db import transaction
 
 from . import steam
@@ -17,8 +21,8 @@ def init_apps():
         App.objects.bulk_create(new_apps)
 
 
-def update_app_tags(app):
-    raw_store_page, tags = steam.get_app_tags(app.id)
+def update_app_tags(app, tags):
+    # TODO: Optimize.
     for tag_info in tags:
         tag, __ = Tag.objects.get_or_create(
             id=tag_info['tagid'],
@@ -34,5 +38,17 @@ def update_app_tags(app):
                 browseable=tag_info.get('browseable'),
             ),
         )
-    app.raw_store_page = raw_store_page
-    app.save()
+
+
+app_tags_pattern = re.compile(r'\[{.*?"tagid".*?}\]')
+
+
+def find_app_tags(store_page):
+    if store_page is not None:
+        soup = BeautifulSoup(store_page, 'lxml')
+
+        for script in soup.select('script:not([src])'):
+            match = app_tags_pattern.search(script.text)
+            if match:
+                return json.loads(match.group())
+    return []

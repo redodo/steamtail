@@ -81,28 +81,28 @@ class AppAdmin(admin.ModelAdmin):
     inlines = [AppInline]
     date_hierarchy = 'release_date'
     actions = [
-        'soft_update_apps',
+        #'soft_update_apps',
         'update_pending_apps',
         'update_apps',
     ]
 
     def soft_update_apps(self, request, queryset):
         for app in queryset.filter(unknown=False):
-            update_app.delay(app.id, refresh=False)
+            update_app(app, refresh=False)
     soft_update_apps.short_description = _(
         'Soft update selected apps'
     )
 
     def update_pending_apps(self, request, queryset):
         for app in queryset.filter(unknown=None):
-            update_app.delay(app.id)
+            update_app(app)
     update_pending_apps.short_description = _(
         'Update pending selected apps'
     )
 
     def update_apps(self, request, queryset):
         for app in queryset:
-            update_app.delay(app.id, refresh=True)
+            update_app(app, refresh=True)
     update_apps.short_description = _(
         'Force update selected apps'
     )

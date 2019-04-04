@@ -1,35 +1,49 @@
 import json
 
 import pendulum
-from celery import shared_task
+from celery import chord, shared_task
 from django.db import transaction
 from django.db.models import Q
 
-from . import steam
-from .models import App, AppTag, Tag
-from .utils import init_apps, update_app_tags
+import steamworker
+
+from .models import App
+from .utils import (
+    init_apps,
+    find_app_tags,
+    update_app_tags,
+)
 
 
 @shared_task
-def update_apps():
-    with transaction.atomic():
-        init_apps()
-        for app in App.objects.filter(Q(unknown=False) | Q(unknown=None)):
-            update_app.delay(app.id)
+def update_all_apps():
+    init_apps()
+    for app in App.objects.filter(Q(unknown=False) | Q(unknown=None)):
+        update_app(app)
 
 
-@shared_task(rate_limit='40/m')
-def update_app(app_id, refresh=True):
+def update_app(app, refresh=True):
+    # TODO: Implement refresh option.
+    chord([
+        steamworker.tasks.get_app_info.s(app.id),
+        steamworker.tasks.get_store_page.s(app.id),
+    ])(
+        process_app_data.s(app.id)
+    )
+
+
+@shared_task
+def process_app_data(data, app_id):
+    app_info, store_page = data
     app = App.objects.get(id=app_id)
 
-    if refresh or app.unknown is None:
-        app_info = steam.get_app_info(app_id)
-        update_app_tags(app)
-    else:
-        app_info = app.app_info
+    # Update tags
+    tags = find_app_tags(store_page)
+    update_app_tags(app, tags)
 
     app.unknown = app_info is None
     app.raw_info = app_info
+    app.raw_store_page = store_page.encode('utf-8')
 
     if app_info is not None:
         # Fields that are always in app_info
@@ -54,7 +68,4 @@ def update_app(app_id, refresh=True):
                         '%s with release date %s' %
                         (e.args[0], app_info['release_date']['date']),
                     )
-
     app.save()
-
-    return app_info

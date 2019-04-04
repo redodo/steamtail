@@ -1,10 +1,12 @@
+amqp
 beautifulsoup4
 celery
 django
 django-admin-interface
-django-celery-beat
+ipython
 lxml
 pendulum
 psycopg2-binary
+redis
 requests
 sentry-sdk
