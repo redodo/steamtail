@@ -7,61 +7,82 @@ services:
         volumes:
             - mq-data:/var/lib/rabbitmq
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - node.role == manager
 
     redis:
         image: redis
         volumes:
             - redis-data:/data
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - node.role == manager
 
     db:
         image: postgres
         volumes:
             - db-data:/var/lib/postgresql/data
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - node.role == manager
 
     web:
-        build: .
+        image: redodo/steamtail
         entrypoint: python manage.py
         command: runserver 0.0.0.0:8814
-        volumes:
-            - .:/app
         ports:
             - "8814:8814"
         depends_on:
             - db
             - mq
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - node.role == manager
 
     # The steamworker only and exclusively processes Steam requests
     # to mitigate and scale rate limits. It does not require database
     # access.
     steamworker:
-        build: .
+        image: redodo/steamtail
         entrypoint: celery -A proj worker -Q steamworker
         command: -l info
-        volumes:
-            - .:/app
         depends_on:
             - mq
             - redis
         restart: unless-stopped
         environment:
             DJANGO_SETTINGS_MODULE: proj.settings.steamworker
+        deploy:
+            mode: global
 
     # The default worker processes all other tasks.
     worker:
-        build: .
+        image: redodo/steamtail
         entrypoint: celery -A proj worker -Q steamworker
         entrypoint: celery -A proj worker
         command: -l info
-        volumes:
-            - .:/app
         depends_on:
             - db
             - mq
             - redis
         restart: unless-stopped
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - node.role == manager
 
 volumes:
     db-data:
