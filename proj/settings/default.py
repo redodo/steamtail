@@ -58,7 +58,7 @@ if 'USE_S3_STATICFILES' in os.environ:
     AWS_S3_REGION_NAME = 'ams3'
     AWS_STORAGE_BUCKET_NAME = 'steamtail'
 
-    AWS_S3_ENDPOINT_URL = '${AWS_S3_REGION_NAME}.digitaloceanspaces.com'
+    AWS_S3_ENDPOINT_URL = '%s.digitaloceanspaces.com' % AWS_S3_REGION_NAME
     AWS_ACCESS_KEY_ID = secret_from_env('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = secret_from_env('AWS_SECRET_ACCESS_KEY')
 
