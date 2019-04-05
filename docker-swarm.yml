@@ -48,7 +48,7 @@ services:
             - sentry_dsn
         environment:
             DEBUG: 0
-            SENTRY_DNS_FILE: /run/secrets/sentry_dsn
+            SENTRY_DSN_FILE: /run/secrets/sentry_dsn
         deploy:
             replicas: 1
             restart_policy:
@@ -74,7 +74,7 @@ services:
             - sentry_dsn
         environment:
             DEBUG: 0
-            SENTRY_DNS_FILE: /run/secrets/sentry_dsn
+            SENTRY_DSN_FILE: /run/secrets/sentry_dsn
             DJANGO_SETTINGS_MODULE: proj.settings.steamworker
         deploy:
             restart_policy:
@@ -98,7 +98,7 @@ services:
             - sentry_dsn
         environment:
             DEBUG: 0
-            SENTRY_DNS_FILE: /run/secrets/sentry_dsn
+            SENTRY_DSN_FILE: /run/secrets/sentry_dsn
         deploy:
             replicas: 1
             restart_policy:
