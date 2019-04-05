@@ -1,4 +1,4 @@
-version: "3"
+version: "3.7"
 
 services:
 
@@ -46,7 +46,7 @@ services:
             - mq
         restart: unless-stopped
         secrets:
-            sentry_dsn:
+            - sentry_dsn
         environment:
             SENTRY_DNS_FILE: /run/secrets/sentry_dsn
         deploy:
@@ -67,7 +67,7 @@ services:
             - redis
         restart: unless-stopped
         secrets:
-            sentry_dsn:
+            - sentry_dsn
         environment:
             SENTRY_DNS_FILE: /run/secrets/sentry_dsn
             DJANGO_SETTINGS_MODULE: proj.settings.steamworker
@@ -86,7 +86,7 @@ services:
             - redis
         restart: unless-stopped
         secrets:
-            sentry_dsn:
+            - sentry_dsn
         environment:
             SENTRY_DNS_FILE: /run/secrets/sentry_dsn
         deploy:
