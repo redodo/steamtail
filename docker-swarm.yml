@@ -95,6 +95,10 @@ services:
                 constraints:
                     - node.role == manager
 
+secrets:
+    sentry_dsn:
+        external: true
+
 volumes:
     db-data:
     mq-data:
