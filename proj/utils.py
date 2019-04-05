@@ -11,6 +11,6 @@ def secret_from_env(key, default=None):
     if secret_filename:
         secret_file = Path(secret_filename)
         if secret_file.exists():
-            return secret_file.read_text()
+            return secret_file.read_text().strip()
 
     return default
