@@ -45,6 +45,8 @@ services:
             - db
             - mq
         restart: unless-stopped
+        environment:
+            SENTRY_DNS_FILE: /run/secrets/sentry_dsn
         deploy:
             replicas: 1
             placement:
@@ -63,6 +65,7 @@ services:
             - redis
         restart: unless-stopped
         environment:
+            SENTRY_DNS_FILE: /run/secrets/sentry_dsn
             DJANGO_SETTINGS_MODULE: proj.settings.steamworker
         deploy:
             mode: global
@@ -78,6 +81,8 @@ services:
             - mq
             - redis
         restart: unless-stopped
+        environment:
+            SENTRY_DNS_FILE: /run/secrets/sentry_dsn
         deploy:
             replicas: 1
             placement:
