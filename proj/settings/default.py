@@ -57,14 +57,17 @@ if 'USE_S3_STATICFILES' in os.environ:
     AWS_SECRET_ACCESS_KEY = secret_from_env('AWS_SECRET_ACCESS_KEY')
 
     # TODO: make these configurable
-    AWS_S3_REGION_NAME = 'ams3'
     AWS_STORAGE_BUCKET_NAME = 'steamtail'
+    AWS_S3_ENDPOINT_URL = 'https://ams3.digitaloceanspaces.com'
+    AWS_S3_CUSTOM_DOMAIN = 'steamtail.ams3.digitaloceanspaces.com'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_LOCATION = 'static'
+    AWS_DEFAULT_ACL = 'public-read'
 
-    AWS_S3_ENDPOINT_URL = 'https://%s.%s.digitaloceanspaces.com' % (
-        AWS_STORAGE_BUCKET_NAME,
-        AWS_S3_REGION_NAME,
-    )
-    STATIC_URL = '%s/' % AWS_S3_ENDPOINT_URL
+    STATIC_URL = '{}/{}/'.format(AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 else:
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
