@@ -1,12 +1,14 @@
 import os
+from ..utils import secret_from_env
 
 # Sentry
-if 'SENTRY_DSN' in os.environ:
+sentry_dsn = secret_from_env('SENTRY_DSN')
+if sentry_dsn:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
 
     sentry_sdk.init(
-        dsn=os.environ['SENTRY_DSN'],
+        dsn=sentry_dsn,
         integrations=[DjangoIntegration()],
     )
 
