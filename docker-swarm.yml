@@ -45,9 +45,14 @@ services:
             - db
             - mq
         secrets:
+            - aws_access_key_id
+            - aws_secret_access_key
             - sentry_dsn
         environment:
             DEBUG: 0
+            USE_S3_STATICFILES: 1
+            AWS_ACCESS_KEY_ID_FILE: /run/secrets/aws_access_key_id
+            AWS_SECRET_ACCESS_KEY_FILE: /run/secrets/aws_secret_access_key
             SENTRY_DSN_FILE: /run/secrets/sentry_dsn
         deploy:
             replicas: 1
@@ -111,6 +116,10 @@ services:
                     - node.role == manager
 
 secrets:
+    aws_access_key_id:
+        external: true
+    aws_secret_access_key:
+        external: true
     sentry_dsn:
         external: true
 

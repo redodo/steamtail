@@ -1,8 +1,10 @@
 amqp
 beautifulsoup4
+boto3
 celery
 django
 django-admin-interface
+django-storages
 ipython
 lxml
 pendulum
