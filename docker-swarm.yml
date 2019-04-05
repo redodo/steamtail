@@ -48,6 +48,7 @@ services:
         secrets:
             - sentry_dsn
         environment:
+            DEBUG: 0
             SENTRY_DNS_FILE: /run/secrets/sentry_dsn
         deploy:
             replicas: 1
@@ -69,6 +70,7 @@ services:
         secrets:
             - sentry_dsn
         environment:
+            DEBUG: 0
             SENTRY_DNS_FILE: /run/secrets/sentry_dsn
             DJANGO_SETTINGS_MODULE: proj.settings.steamworker
         deploy:
@@ -88,6 +90,7 @@ services:
         secrets:
             - sentry_dsn
         environment:
+            DEBUG: 0
             SENTRY_DNS_FILE: /run/secrets/sentry_dsn
         deploy:
             replicas: 1
