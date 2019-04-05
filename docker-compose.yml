@@ -36,7 +36,7 @@ services:
                     - node.role == manager
 
     web:
-        image: localhost:5000/steamtail
+        image: redodo/steamtail
         entrypoint: python manage.py
         command: runserver 0.0.0.0:8814
         volumes:
@@ -57,7 +57,7 @@ services:
     # to mitigate and scale rate limits. It does not require database
     # access.
     steamworker:
-        image: localhost:5000/steamtail
+        image: redodo/steamtail
         entrypoint: celery -A proj worker -Q steamworker
         command: -l info
         volumes:
@@ -73,7 +73,7 @@ services:
 
     # The default worker processes all other tasks.
     worker:
-        image: localhost:5000/steamtail
+        image: redodo/steamtail
         entrypoint: celery -A proj worker -Q steamworker
         entrypoint: celery -A proj worker
         command: -l info
