@@ -43,7 +43,8 @@ def process_app_data(data, app_id):
 
     app.unknown = app_info is None
     app.raw_info = app_info
-    app.raw_store_page = store_page.encode('utf-8') if store_page else None
+    # app.raw_store_page = store_page.encode('utf-8') if store_page else None
+    app.raw_store_page = store_page
 
     if app_info is not None:
         # Fields that are always in app_info

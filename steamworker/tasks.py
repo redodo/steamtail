@@ -40,4 +40,4 @@ def get_store_page(app_id, max_redirects=4):
         return None
     if '/app/' not in r.url:
         return None
-    return r.text
+    return r.content
