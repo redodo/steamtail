@@ -62,10 +62,11 @@ if 'USE_S3_STATICFILES' in os.environ:
     AWS_ACCESS_KEY_ID = secret_from_env('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = secret_from_env('AWS_SECRET_ACCESS_KEY')
 
-    STATIC_URL = 'https://%s.%s/' % (
+    AWS_S3_ENDPOINT_URL = 'https://%s.%s.digitaloceanspaces.com' % (
         AWS_STORAGE_BUCKET_NAME,
-        AWS_S3_ENDPOINT_URL,
+        AWS_S3_REGION_NAME,
     )
+    STATIC_URL = '%s/' % AWS_S3_ENDPOINT_URL
 else:
     STATIC_URL = '/static/'
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
