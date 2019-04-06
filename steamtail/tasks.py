@@ -112,19 +112,16 @@ def update_user_friends(user_id, max_depth=1, min_profile_delay=DEFAULT_PROFILE_
 def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEFAULT_PROFILE_DELAY):
     # efficiently create newly discovered users
     user_ids = friend_ids + [user_id]
-    print(user_ids)
     users = {
         user.id: user
         for user in User.objects.filter(id__in=user_ids)
     }
-    print(users)
     new_users = []
     for id in user_ids:
         if id not in users:
             new_user = User(id=id)
             new_users.append(new_user)
             users[id] = new_user
-    print(new_users)
     User.objects.bulk_create(new_users)
 
     max_last_visited_on = (
@@ -139,9 +136,6 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
             user.friends.add(friend)
 
             if max_depth != 0:
-                print('max depth is not yet zero')
-                print(friend.last_visited_on)
-                print(max_last_visited_on)
                 if friend.last_visited_on is None or \
                         friend.last_visited_on < max_last_visited_on:
                     # TODO: add refresh option
