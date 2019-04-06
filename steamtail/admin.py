@@ -112,5 +112,12 @@ class AppAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     search_fields = ['id']
     autocomplete_fields = ['friends']
-    list_display = ['id', 'last_visited_on']
+    list_display = [
+        'id',
+        'is_private',
+        'last_visited_on',
+    ]
     list_per_page = 15
+    list_filter = [
+        'is_private',
+    ]
