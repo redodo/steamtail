@@ -45,8 +45,37 @@ def get_store_page(app_id, max_redirects=4):
         return None
     if '/app/' not in r.url:
         return None
+    return r.text
 
-    if settings.ENABLE_BINARY_TASK_RESULTS:
-        return r.content
-    else:
-        return r.text
+
+def get_profile_games(user_id, html):
+    raise NotImplementedError()
+
+
+def get_profile_friends(user_id, html):
+    return []
+
+
+GAMES = 1
+FRIENDS = 2
+PROFILE_SECTION_URLS = {
+    GAMES:   'https://steamcommunity.com/profiles/[U:1:{}]/games/?tab=all',
+    FRIENDS: 'https://steamcommunity.com/profiles/[U:1:{}]/friends',
+}
+PROFILE_SECTION_HANDLERS = {
+    GAMES:   get_profile_games,
+    FRIENDS: get_profile_friends,
+}
+
+
+@shared_task(rate_limit='60/m')
+def get_profile_section(user_id, section):
+    """Section redirects to the correct handling function. The reason those 
+    functions aren't set up as different tasks is that we want to rate limit
+    requests to the hostname.
+    """
+    url = PROFILE_SECTION_URLS[section].format(user_id)
+    r = requests.get(url)
+    r.raise_for_status()
+    handler = PROFILE_SECTION_HANDLERS[section]
+    return handler(user_id, r.text)

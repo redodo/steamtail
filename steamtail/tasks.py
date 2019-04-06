@@ -1,14 +1,15 @@
 import json
 
 import pendulum
-from celery import chord, shared_task
+from celery import chain, chord, shared_task
 from django.db import transaction
 from django.db.models import Q
+from django.utils import timezone
 
 import steamworker
 
 from .decorators import kwarg_inputs
-from .models import App
+from .models import App, User
 from .utils import (
     init_apps,
     find_app_tags,
@@ -43,16 +44,12 @@ def update_app(app, refresh=True):
 @shared_task
 @kwarg_inputs
 def process_app_data(app_id, app_info=None, store_page=None):
-    print(app_id)
-    print(type(app_info))
-    print(type(store_page))
     app = App.objects.get(id=app_id)
     app_info = app_info or app.raw_info
     store_page = store_page or app.raw_store_page
 
     if store_page is not None:
-        if not isinstance(store_page, bytes):
-            store_page = store_page.encode('utf-8')
+        store_page = store_page.encode('utf-8')
         # Update tags
         tags = find_app_tags(store_page)
         update_app_tags(app, tags)
@@ -89,3 +86,59 @@ def process_app_data(app_id, app_info=None, store_page=None):
                         (e.args[0], app_info['release_date']['date']),
                     )
     app.save()
+
+
+DEFAULT_PROFILE_DELAY = 86400
+
+
+def update_user_friends(user_id, max_depth=1, min_profile_delay=DEFAULT_PROFILE_DELAY):
+    """
+    :param min_profile_delay: the minimum delay between visits of the same profile
+    """
+    chain(
+        steamworker.tasks.get_profile_section.s(
+            user_id,
+            section=steamworker.tasks.FRIENDS,
+        ),
+        process_user_friends.s(
+            user_id,
+            max_depth=max_depth-1,
+            min_profile_delay=min_profile_delay,
+        ),
+    ).delay()
+
+
+@shared_task
+def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEFAULT_PROFILE_DELAY):
+    # efficiently create newly discovered users
+    user_ids = friend_ids + [user_id]
+    users = {
+        user.id: user
+        for user in User.objects.filter(id__in=user_ids)
+    }
+    new_users = []
+    for id in user_ids:
+        if id not in users:
+            new_user = User(id=id)
+            new_users.append(new_user)
+            users[id] = new_user
+    User.objects.bulk_create(new_users)
+
+    max_last_visited_on = (
+        timezone.now() - timezone.timedelta(seconds=min_profile_delay)
+    )
+
+    # create connections between current user and friends
+    with transaction.atomic():
+        user = users[user_id]
+        for friend_id in friend_ids:
+            friend = users[friend_id]
+            user.friends.add(friend)
+
+            if max_depth != 0:
+                if friend.last_visited_on is None or \
+                        friend.last_visited_on < max_last_visited_on:
+                    update_user_friends(friend_id, max_depth=max_depth)
+
+        user.last_visited_on = timezone.now()
+        user.save()

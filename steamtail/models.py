@@ -138,6 +138,14 @@ class User(models.Model):
         related_name='users',
         verbose_name=_('apps'),
     )
+    friends = models.ManyToManyField(
+        'User',
+        verbose_name=_('friends'),
+    )
+    last_visited_on = models.DateTimeField(
+        _('last visited on'),
+        null=True,
+    )
 
     class Meta:
         verbose_name = _('user')
