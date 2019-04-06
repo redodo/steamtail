@@ -37,13 +37,15 @@ def process_app_data(data, app_id):
     app_info, store_page = data
     app = App.objects.get(id=app_id)
 
-    # Update tags
-    tags = find_app_tags(store_page)
-    update_app_tags(app, tags)
+    if store_page is not None:
+        if not isinstance(store_page, bytes):
+            store_page = store_page.encode('utf-8')
+        # Update tags
+        tags = find_app_tags(store_page)
+        update_app_tags(app, tags)
 
     app.unknown = app_info is None
     app.raw_info = app_info
-    # app.raw_store_page = store_page.encode('utf-8') if store_page else None
     app.raw_store_page = store_page
 
     if app_info is not None:

@@ -47,9 +47,10 @@ CELERY_RESULT_BACKEND = os.environ.get(
     'CELERY_RESULT_BACKEND',
     'redis://redis:6379/0',
 )
-CELERY_ACCEPT_CONTENT = ['pickle']
-CELERY_TASK_SERIALIZER = 'pickle'
-CELERY_RESULT_SERIALIZER = 'pickle'
+
+CELERY_TASK_SERIALIZER = os.environ.get('CELERY_SERIALIZER', 'json')
+CELERY_RESULT_SERIALIZER = CELERY_TASK_SERIALIZER
+CELERY_ACCEPT_CONTENT = [CELERY_TASK_SERIALIZER]
 CELERY_WORKER_CONCURRENCY = 2
 CELERY_MAX_TASKS_PER_CHILD = 4
 CELERY_ACKS_LATE = True
@@ -57,6 +58,7 @@ CELERY_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_ROUTES = {
     'steamworker.tasks.*': {'queue': 'steamworker'},
 }
+ENABLE_BINARY_TASK_RESULTS = bool(int(os.environ.get('ENABLE_BINARY_TASK_RESULTS', 0)))
 
 # Internationalization
 # https://docs.djangoproject.com/en/stable/topics/i18n/

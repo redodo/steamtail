@@ -4,6 +4,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from celery import shared_task
+from django.conf import settings
 
 
 APP_LIST_URL = 'https://api.steampowered.com/ISteamApps/GetAppList/v2/'
@@ -40,4 +41,8 @@ def get_store_page(app_id, max_redirects=4):
         return None
     if '/app/' not in r.url:
         return None
-    return r.content
+
+    if settings.ENABLE_BINARY_TASK_RESULTS:
+        return r.content
+    else:
+        return r.text
