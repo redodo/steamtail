@@ -34,8 +34,10 @@ def update_app(app, refresh=True):
 
 @shared_task
 def process_app_data(data, app_id):
+    print(app_id)
+    print(type(data))
+    print(data)
     app_info, store_page = data
-    print(app_id, app_info, store_page)
     app = App.objects.get(id=app_id)
 
     if store_page is not None:
