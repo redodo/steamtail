@@ -60,8 +60,8 @@ def get_profile_friends(user_id, html):
 GAMES = 1
 FRIENDS = 2
 PROFILE_SECTION_URLS = {
-    GAMES:   'https://steamcommunity.com/profiles/[U:1:{}]/games/?tab=all',
-    FRIENDS: 'https://steamcommunity.com/profiles/[U:1:{}]/friends',
+    GAMES:   'https://steamcommunity.com/profiles/{}/games/?tab=all',
+    FRIENDS: 'https://steamcommunity.com/profiles/{}/friends',
 }
 PROFILE_SECTION_HANDLERS = {
     GAMES:   get_profile_games,
