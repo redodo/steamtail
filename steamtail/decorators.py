@@ -15,17 +15,22 @@ def kwarg_result(name):
     return decorator
 
 
-def kwarg_inputs(fn):
+def optional_kwarg_result(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
-        for arg in args:
-            if isinstance(arg, (list, tuple)):
-                remove_from_arg = []
-                for result in arg:
-                    if isinstance(result, dict):
-                        kwargs.update(result)
-                        remove_from_arg.append(result)
-                for result in remove_from_arg:
-                    arg.remove(result)
-        args = [arg for arg in args if arg]
-        return fn(*args, *kwargs)
+        name = kwargs.pop('kwarg_result_name', None)
+        result = fn(*args, **kwargs)
+        if name is None:
+            return result
+        else:
+            return {name: result}
+
+
+def kwarg_inputs(fn):
+    @functools.wraps(fn)
+    def wrapper(arg, *args, **kwargs):
+        if isinstance(arg, list):
+            for result in arg:
+                kwargs.update(result)
+        return fn(*args, **kwargs)
+    return wrapper

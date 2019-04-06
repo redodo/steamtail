@@ -7,6 +7,7 @@ from django.db.models import Q
 
 import steamworker
 
+from .decorators import kwarg_inputs
 from .models import App
 from .utils import (
     init_apps,
@@ -33,11 +34,11 @@ def update_app(app, refresh=True):
 
 
 @shared_task
-def process_app_data(data, app_id):
+@kwarg_inputs
+def process_app_data(app_id, app_info, store_page):
     print(app_id)
-    print(type(data))
-    print(data)
-    app_info, store_page = data
+    print(type(app_info))
+    print(type(store_page))
     app = App.objects.get(id=app_id)
 
     if store_page is not None:

@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 from celery import shared_task
 from django.conf import settings
 
+from steamtail.decorators import kwarg_result
+
 
 APP_LIST_URL = 'https://api.steampowered.com/ISteamApps/GetAppList/v2/'
 APP_INFO_URL = 'https://store.steampowered.com/api/appdetails?appids={}'
@@ -13,6 +15,7 @@ STORE_PAGE_URL = 'https://store.steampowered.com/app/{}/'
 
 
 @shared_task(rate_limit='40/m')
+@kwarg_result(name='app_info')
 def get_app_info(app_id):
     url = APP_INFO_URL.format(app_id)
     r = requests.get(url)
@@ -30,6 +33,7 @@ def get_app_info(app_id):
 
 
 @shared_task(rate_limit='40/m')
+@kwarg_result(name='store_page')
 def get_store_page(app_id, max_redirects=4):
     session = requests.session()
     session.max_redirects = max_redirects
