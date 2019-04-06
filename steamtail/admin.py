@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-from .models import App, Tag
+from .models import App, Tag, User
 from .tasks import update_app
 
 
@@ -106,3 +106,11 @@ class AppAdmin(admin.ModelAdmin):
     update_apps.short_description = _(
         'Force update selected apps'
     )
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    search_fields = ['id']
+    autocomplete_fields = ['friends']
+    list_display = ['id', 'last_visited_on']
+    list_per_page = 15
