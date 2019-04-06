@@ -47,6 +47,7 @@ services:
             - redis
         restart: unless-stopped
         environment:
+            C_FORCE_ROOT: 1
             DJANGO_SETTINGS_MODULE: proj.settings.steamworker
 
     # The default worker processes all other tasks.
@@ -62,6 +63,8 @@ services:
             - mq
             - redis
         restart: unless-stopped
+        environment:
+            C_FORCE_ROOT: 1
 
 volumes:
     db-data:
