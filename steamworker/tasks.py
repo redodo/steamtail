@@ -53,7 +53,8 @@ def get_profile_games(user_id, html):
 
 
 def get_profile_friends(user_id, html):
-    return []
+    soup = BeautifulSoup(html, 'lxml')
+    return [el['data-steamid'] for el in soup.select('#friends_list [data-steamid]')]
 
 
 GAMES = 1
