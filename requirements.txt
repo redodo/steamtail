@@ -1,7 +1,7 @@
 amqp
 beautifulsoup4
 boto3
-celery
+celery[brotli]
 django
 django-admin-interface
 django-storages
