@@ -23,21 +23,22 @@ def init_apps():
 
 def update_app_tags(app, tags):
     # TODO: Optimize.
-    for tag_info in tags:
-        tag, __ = Tag.objects.get_or_create(
-            id=tag_info['tagid'],
-            defaults=dict(
-                name=tag_info['name'],
+    with transaction.atomic():
+        for tag_info in tags:
+            tag, __ = Tag.objects.get_or_create(
+                id=tag_info['tagid'],
+                defaults=dict(
+                    name=tag_info['name'],
+                )
             )
-        )
-        AppTag.objects.update_or_create(
-            app=app,
-            tag=tag,
-            defaults=dict(
-                votes=tag_info['count'],
-                browseable=tag_info.get('browseable'),
-            ),
-        )
+            AppTag.objects.update_or_create(
+                app=app,
+                tag=tag,
+                defaults=dict(
+                    votes=tag_info['count'],
+                    browseable=tag_info.get('browseable'),
+                ),
+            )
 
 
 app_tags_pattern = re.compile(r'\[{.*?"tagid".*?}\]')

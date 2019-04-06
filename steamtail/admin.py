@@ -81,7 +81,7 @@ class AppAdmin(admin.ModelAdmin):
     inlines = [AppInline]
     date_hierarchy = 'release_date'
     actions = [
-        #'soft_update_apps',
+        'soft_update_apps',
         'update_pending_apps',
         'update_apps',
     ]

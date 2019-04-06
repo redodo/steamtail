@@ -24,22 +24,31 @@ def update_all_apps():
 
 
 def update_app(app, refresh=True):
-    # TODO: Implement refresh option.
-    chord([
-        steamworker.tasks.get_app_info.s(app.id),
-        steamworker.tasks.get_store_page.s(app.id),
-    ])(
-        process_app_data.s(app.id)
-    )
+    chord_tasks = []
+    if refresh or app.raw_info is None:
+        chord_tasks.append(
+            steamworker.tasks.get_app_info.s(app.id)
+        )
+    if refresh or app.raw_store_page is None:
+        chord_tasks.append(
+            steamworker.tasks.get_store_page.s(app.id)
+        )
+    process_app_data_task = process_app_data.s(app.id)
+    if chord_tasks:
+        chord(chord_tasks)(process_app_data_task)
+    else:
+        process_app_data_task.delay()
 
 
 @shared_task
 @kwarg_inputs
-def process_app_data(app_id, app_info, store_page):
+def process_app_data(app_id, app_info=None, store_page=None):
     print(app_id)
     print(type(app_info))
     print(type(store_page))
     app = App.objects.get(id=app_id)
+    app_info = app_info or app.raw_info
+    store_page = store_page or app.raw_store_page
 
     if store_page is not None:
         if not isinstance(store_page, bytes):
@@ -61,7 +70,11 @@ def process_app_data(app_id, app_info, store_page):
 
         # Optional fields
         if 'fullgame' in app_info and app_info['fullgame'].get('appid'):
-            app.parent = App.objects.get(id=app_info['fullgame']['appid'])
+            try:
+                app.parent = App.objects.get(id=app_info['fullgame']['appid'])
+            except App.DoesNotExist:
+                # TODO: Figure out a way to get the correct parent app in this case.
+                pass
         if 'release_date' in app_info:
             app.coming_soon = app_info.get('coming_soon', False)
             if app_info['release_date']['date']:
