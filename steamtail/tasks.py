@@ -131,6 +131,8 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
     # create connections between current user and friends
     with transaction.atomic():
         user = users[user_id]
+        user.is_private = len(friend_ids) == 0
+
         for friend_id in friend_ids:
             friend = users[friend_id]
             user.friends.add(friend)

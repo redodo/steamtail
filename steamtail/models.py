@@ -146,6 +146,10 @@ class User(models.Model):
         _('last visited on'),
         null=True,
     )
+    is_private = models.BooleanField(
+        _('is profile private'),
+        null=True,
+    )
 
     class Meta:
         ordering = ['id']
