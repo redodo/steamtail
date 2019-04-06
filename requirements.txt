@@ -6,7 +6,6 @@ django
 django-admin-interface
 django-storages
 ipython
-msgpack
 lxml
 pendulum
 psycopg2-binary
