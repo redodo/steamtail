@@ -111,15 +111,15 @@ def update_user_friends(user_id, max_depth=1, min_profile_delay=DEFAULT_PROFILE_
 @shared_task
 def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEFAULT_PROFILE_DELAY):
     # efficiently create newly discovered users
-    user_ids = friend_ids + [user_id]
+    user_ids = friend_ids + [(user_id, None)]
     users = {
         user.id: user
-        for user in User.objects.filter(id__in=user_ids)
+        for user in User.objects.filter(id__in=[u[0] for u in user_ids])
     }
     new_users = []
-    for id in user_ids:
+    for id, is_private in user_ids:
         if id not in users:
-            new_user = User(id=id)
+            new_user = User(id=id, is_private=is_private)
             new_users.append(new_user)
             users[id] = new_user
     User.objects.bulk_create(new_users)
@@ -131,13 +131,12 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
     # create connections between current user and friends
     with transaction.atomic():
         user = users[user_id]
-        user.is_private = len(friend_ids) == 0
 
-        for friend_id in friend_ids:
+        for friend_id, is_private in friend_ids:
             friend = users[friend_id]
             user.friends.add(friend)
 
-            if max_depth != 0:
+            if not is_private and max_depth != 0:
                 if friend.last_visited_on is None or \
                         friend.last_visited_on < max_last_visited_on:
                     # TODO: add refresh option

@@ -52,9 +52,22 @@ def get_profile_games(user_id, html):
     raise NotImplementedError()
 
 
+def _is_friend_profile_private(friend_element):
+    return (
+        'offline' in friend_element['class'] and
+        friend_element.select_one('.friend_last_online_text').text.strip().lower() == 'last online'
+    )
+
+
 def get_profile_friends(user_id, html):
     soup = BeautifulSoup(html, 'lxml')
-    return [int(el['data-steamid']) for el in soup.select('#friends_list [data-steamid]')]
+    friends = []
+    for friend in soup.select('#friends_list [data-steamid]'):
+        friends.append((
+            int(friend['data-steamid']),
+            _is_friend_profile_private(friend),
+        ))
+    return friends
 
 
 GAMES = 1
