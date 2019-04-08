@@ -2,7 +2,7 @@ import json
 
 import pendulum
 from celery import chain, chord, shared_task
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -122,7 +122,7 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
             new_user = User(id=id, is_private=is_private)
             new_users.append(new_user)
             users[id] = new_user
-    User.objects.bulk_create(new_users)
+    User.objects.bulk_create(new_users, ignore_conflicts=True)
 
     max_last_visited_on = (
         timezone.now() - timezone.timedelta(seconds=min_profile_delay)
@@ -134,7 +134,12 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
 
         for friend_id, is_private in friend_ids:
             friend = users[friend_id]
-            user.friends.add(friend)
+            try:
+                user.friends.add(friend)
+            except IntegrityError:
+                # The friendship is already registered
+                # not really an issue when that fails.
+                pass
 
             if not is_private and max_depth != 0:
                 if friend.last_visited_on is None or \
