@@ -129,26 +129,25 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
     )
 
     # create connections between current user and friends
-    with transaction.atomic():
-        user = users[user_id]
+    user = users[user_id]
 
-        for friend_id, is_private in friend_ids:
-            friend = users[friend_id]
-            try:
-                user.friends.add(friend)
-            except IntegrityError:
-                # The friendship is already registered
-                # not really an issue when that fails.
-                pass
+    for friend_id, is_private in friend_ids:
+        friend = users[friend_id]
+        try:
+            user.friends.add(friend)
+        except IntegrityError:
+            # The friendship is already registered
+            # not really an issue when that fails.
+            pass
 
-            if not is_private and max_depth != 0:
-                if friend.last_visited_on is None or \
-                        friend.last_visited_on < max_last_visited_on:
-                    # TODO: add refresh option
-                    # If max_depth has not been exceeded and the user
-                    # has friends. We can check if those profiles need
-                    # to be updated.
-                    update_user_friends(friend_id, max_depth=max_depth)
+        if not is_private and max_depth != 0:
+            if friend.last_visited_on is None or \
+                    friend.last_visited_on < max_last_visited_on:
+                # TODO: add refresh option
+                # If max_depth has not been exceeded and the user
+                # has friends. We can check if those profiles need
+                # to be updated.
+                update_user_friends(friend_id, max_depth=max_depth)
 
-        user.last_visited_on = timezone.now()
-        user.save()
+    user.last_visited_on = timezone.now()
+    user.save()
