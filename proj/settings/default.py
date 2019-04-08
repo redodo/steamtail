@@ -3,6 +3,9 @@ from ..utils import secret_from_env
 
 from ._shared import *
 
+CELERY_WORKER_CONCURRENCY = 4
+CELERY_MAX_TASKS_PER_CHILD = 2
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
