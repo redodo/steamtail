@@ -6,7 +6,6 @@ services:
         image: rabbitmq
         volumes:
             - mq-data:/var/lib/rabbitmq
-        restart: unless-stopped
         deploy:
             replicas: 1
             placement:
@@ -17,7 +16,6 @@ services:
         image: redis
         volumes:
             - redis-data:/data
-        restart: unless-stopped
         deploy:
             replicas: 1
             placement:
@@ -28,7 +26,6 @@ services:
         image: postgres
         volumes:
             - db-data:/var/lib/postgresql/data
-        restart: unless-stopped
         deploy:
             replicas: 1
             placement:
