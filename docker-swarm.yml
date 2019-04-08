@@ -92,7 +92,6 @@ services:
     # The default worker processes all other tasks.
     worker:
         image: redodo/steamtail
-        entrypoint: celery -A proj worker -Q steamworker
         entrypoint: celery -A proj worker
         command: -l info
         depends_on:
@@ -104,6 +103,28 @@ services:
         environment:
             DEBUG: 0
             SENTRY_DSN_FILE: /run/secrets/sentry_dsn
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+                max_attempts: 3
+                window: 30s
+                delay: 5s
+            placement:
+                constraints:
+                    - node.role == manager
+
+    flower:
+        image: redodo/steamtail
+        entrypoint: celery -A proj flower
+        command: --basic_auth=outermosttail:vaporizedsteam
+        ports:
+            - "5555:5555"
+        depends_on:
+            - mq
+            - redis
+        environment:
+            DEBUG: 0
         deploy:
             replicas: 1
             restart_policy:

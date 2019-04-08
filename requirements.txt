@@ -5,6 +5,7 @@ celery[brotli]
 django
 django-admin-interface
 django-storages
+flower
 ipython
 msgpack
 lxml
