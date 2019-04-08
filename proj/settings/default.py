@@ -59,7 +59,7 @@ if 'USE_S3_STATICFILES' in os.environ:
     # TODO: make these configurable
     AWS_STORAGE_BUCKET_NAME = 'steamtail'
     AWS_S3_ENDPOINT_URL = 'https://ams3.digitaloceanspaces.com'
-    AWS_S3_CUSTOM_DOMAIN = 'steamtail.ams3.digitaloceanspaces.com'
+    AWS_S3_CUSTOM_DOMAIN = 'steamtail.ams3.cdn.digitaloceanspaces.com'
     AWS_S3_OBJECT_PARAMETERS = {
         'CacheControl': 'max-age=86400',
     }
