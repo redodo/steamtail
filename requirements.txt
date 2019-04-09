@@ -3,7 +3,6 @@ beautifulsoup4
 boto3
 celery[brotli]
 django
-django-admin-interface
 django-storages
 flower
 ipython

@@ -67,7 +67,7 @@ services:
     # access.
     steamworker:
         image: redodo/steamtail
-        entrypoint: celery -A proj worker -Q steamworker
+        entrypoint: celery -A proj worker -Q steamworker -n steamworker@${HOSTNAME}:%h
         command: -l info
         depends_on:
             - mq
@@ -89,7 +89,7 @@ services:
     # The default worker processes all other tasks.
     worker:
         image: redodo/steamtail
-        entrypoint: celery -A proj worker
+        entrypoint: celery -A proj worker -n worker@${HOSTNAME}:%h
         command: -l info
         depends_on:
             - db

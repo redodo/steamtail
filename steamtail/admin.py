@@ -113,6 +113,7 @@ class UserAppOwnershipInline(admin.TabularInline):
     fields = ['app', 'hours_played']
     readonly_fields = ['app', 'hours_played']
     extra = 0
+    max_num = 0
     can_delete = False
 
 

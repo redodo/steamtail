@@ -4,7 +4,7 @@ from ..utils import secret_from_env
 from ._shared import *
 
 CELERY_WORKER_CONCURRENCY = 4
-CELERY_MAX_TASKS_PER_CHILD = 2
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 
 DATABASES = {
     'default': {
@@ -20,9 +20,6 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
-#    'admin_interface',
-#    'colorfield',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

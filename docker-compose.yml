@@ -38,7 +38,7 @@ services:
     # access.
     steamworker:
         build: .
-        entrypoint: celery -A proj worker -Q steamworker
+        entrypoint: celery -A proj worker -Q steamworker -n steamworker@${HOSTNAME}:%h
         command: -l info
         volumes:
             - .:/app
@@ -53,8 +53,7 @@ services:
     # The default worker processes all other tasks.
     worker:
         build: .
-        entrypoint: celery -A proj worker -Q steamworker
-        entrypoint: celery -A proj worker
+        entrypoint: celery -A proj worker -n worker@${HOSTNAME}:%h
         command: -l info
         volumes:
             - .:/app
@@ -65,6 +64,19 @@ services:
         restart: unless-stopped
         environment:
             C_FORCE_ROOT: 1
+
+    flower:
+        build: .
+        entrypoint: celery -A proj flower
+        command: --basic_auth=outermosttail:vaporizedsteam
+        ports:
+            - "5555:5555"
+        depends_on:
+            - mq
+            - redis
+        restart: unless-stopped
+        environment:
+            DEBUG: 0
 
 volumes:
     db-data:
