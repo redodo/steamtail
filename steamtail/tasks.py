@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 
 import pendulum
 from celery import chain, chord, shared_task
@@ -9,7 +10,7 @@ from django.utils import timezone
 import steamworker.tasks
 
 from .decorators import kwarg_inputs
-from .models import App, User
+from .models import App, User, UserApp
 from .utils import (
     init_apps,
     find_app_tags,
@@ -117,9 +118,9 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
         for user in User.objects.filter(id__in=[u[0] for u in user_ids])
     }
     new_users = []
-    for id, is_private in user_ids:
+    for id, is_public in user_ids:
         if id not in users:
-            new_user = User(id=id, is_private=is_private)
+            new_user = User(id=id, is_public=is_public)
             new_users.append(new_user)
             users[id] = new_user
     User.objects.bulk_create(new_users, ignore_conflicts=True)
@@ -131,7 +132,7 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
     # create connections between current user and friends
     user = users[user_id]
 
-    for friend_id, is_private in friend_ids:
+    for friend_id, is_public in friend_ids:
         friend = users[friend_id]
         try:
             user.friends.add(friend)
@@ -140,14 +141,68 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
             # not really an issue when that fails.
             pass
 
-        if not is_private and max_depth != 0:
-            if friend.last_visited_on is None or \
-                    friend.last_visited_on < max_last_visited_on:
+        if is_public and max_depth != 0:
+            if friend.friends_last_checked_on is None or \
+                    friend.friends_last_checked_on < max_last_visited_on:
                 # TODO: add refresh option
                 # If max_depth has not been exceeded and the user
                 # has friends. We can check if those profiles need
                 # to be updated.
                 update_user_friends(friend_id, max_depth=max_depth)
 
-    user.last_visited_on = timezone.now()
+    user.friends_last_checked_on = timezone.now()
     user.save()
+
+
+def update_user_apps(user_id):
+    chain(
+        steamworker.tasks.get_profile_section.s(
+            user_id,
+            section=steamworker.tasks.GAMES,
+        ),
+        process_user_apps.s(
+            user_id,
+        ),
+    ).delay()
+
+
+@shared_task
+def process_user_apps(result, user_id):
+    user, __ = User.objects.get_or_create(id=user_id)
+    user.is_playtime_public = result.get(
+        'is_ownership_public',
+        user.is_playtime_public,
+    )
+
+    with transaction.atomic():
+        for app_data in result['data']:
+            app, __ = App.objects.get_or_create(
+                id=app_data['appid'],
+                defaults=dict(
+                    name=app_data['name'],
+                ),
+            )
+
+            hours_played = app_data.get('hours_forever')
+            if hours_played:
+                hours_played = Decimal(hours_played.replace(',', ''))
+                user.is_playtime_public = True
+
+            UserApp.objects.update_or_create(
+                user=user,
+                app=app,
+                defaults=dict(
+                    hours_played=hours_played,
+                ),
+            )
+
+        user.is_public = result.get(
+            'is_public',
+            user.is_public,
+        )
+        user.is_ownership_public = result.get(
+            'is_ownership_public',
+            user.is_ownership_public,
+        )
+        user.apps_last_checked_on = timezone.now()
+        user.save()

@@ -142,12 +142,24 @@ class User(models.Model):
         'self',
         verbose_name=_('friends'),
     )
-    last_visited_on = models.DateTimeField(
-        _('last visited on'),
+    friends_last_checked_on = models.DateTimeField(
+        _('friends last checked on'),
         null=True,
     )
-    is_private = models.BooleanField(
-        _('is profile private'),
+    apps_last_checked_on = models.DateTimeField(
+        _('apps last checked on'),
+        null=True,
+    )
+    is_public = models.BooleanField(
+        _('is profile public'),
+        null=True,
+    )
+    is_ownership_public = models.BooleanField(
+        _('is ownership public'),
+        null=True,
+    )
+    is_playtime_public = models.BooleanField(
+        _('is playtime public'),
         null=True,
     )
 
@@ -176,10 +188,6 @@ class UserApp(models.Model):
         _('hours played'),
         max_digits=10,
         decimal_places=2,
-        null=True,
-    )
-    last_played = models.DateTimeField(
-        _('last played'),
         null=True,
     )
 

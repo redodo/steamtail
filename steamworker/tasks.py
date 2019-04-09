@@ -48,8 +48,33 @@ def get_store_page(app_id, max_redirects=4):
     return r.text
 
 
+games_pattern = re.compile(r'\[{.*?"appid".*?}\]')
+
+
 def get_profile_games(user_id, html):
-    raise NotImplementedError()
+    soup = BeautifulSoup(html, 'lxml')
+    if soup.select_one('.profile_private_info'):
+        return dict(
+            data=[],
+            is_public=False,
+            is_ownership_public=False,
+        )
+
+    for script in soup.select('script:not([src])'):
+        match = games_pattern.search(script.text)
+        if match:
+            data = json.loads(match.group())
+            return dict(
+                data=data,
+                is_public=True,
+                is_ownership_public=True,
+            )
+
+    return dict(
+        data=[],
+        is_public=True,
+        is_ownership_public=False,
+    )
 
 
 def _is_friend_profile_private(friend_element):
@@ -65,7 +90,7 @@ def get_profile_friends(user_id, html):
     for friend in soup.select('#friends_list [data-steamid]'):
         friends.append((
             int(friend['data-steamid']),
-            _is_friend_profile_private(friend),
+            not _is_friend_profile_private(friend),
         ))
     return friends
 

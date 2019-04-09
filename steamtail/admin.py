@@ -108,22 +108,41 @@ class AppAdmin(admin.ModelAdmin):
     )
 
 
+class UserAppOwnershipInline(admin.TabularInline):
+    model = User.apps.through
+    fields = ['app', 'hours_played']
+    readonly_fields = ['app', 'hours_played']
+    extra = 0
+    can_delete = False
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     search_fields = ['id']
-    autocomplete_fields = ['friends']
+    autocomplete_fields = ['friends', 'apps']
     list_display = [
         'id',
-        'is_private',
-        'last_visited_on',
+        'is_public',
+        'is_ownership_public',
+        'is_playtime_public',
+        'friends_last_checked_on',
+        'apps_last_checked_on',
     ]
     list_per_page = 15
     list_filter = [
-        'is_private',
+        'is_public',
+        'is_ownership_public',
+        'is_playtime_public',
+    ]
+    inlines = [
+        UserAppOwnershipInline,
     ]
     readonly_fields = [
         'id',
         'friends',
-        'last_visited_on',
-        'is_private',
+        'is_public',
+        'is_ownership_public',
+        'is_playtime_public',
+        'friends_last_checked_on',
+        'apps_last_checked_on',
     ]

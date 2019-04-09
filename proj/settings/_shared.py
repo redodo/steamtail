@@ -56,11 +56,10 @@ CELERY_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_ROUTES = {
     'steamworker.tasks.*': {'queue': 'steamworker'},
 }
-ENABLE_BINARY_TASK_RESULTS = bool(int(os.environ.get('ENABLE_BINARY_TASK_RESULTS', 0)))
 
 # Internationalization
 # https://docs.djangoproject.com/en/stable/topics/i18n/
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'nl-nl'
 TIME_ZONE = 'Europe/Amsterdam'
 USE_I18N = True
 USE_L10N = True
