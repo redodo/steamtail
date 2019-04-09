@@ -56,7 +56,7 @@ games_pattern = re.compile(r'\[{.*?"appid".*?}\]')
 PROFILE_FRIENDS_URL = 'https://steamcommunity.com/profiles/{}/friends'
 
 
-@shared_task(rate_limit='40/m')
+@shared_task(rate_limit='30/m')
 def get_profile_games(user_id):
     url = '{}games/?tab=all'.format(get_vanity_url(user_id))
     r = requests.get(url)
