@@ -121,3 +121,9 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = [
         'is_private',
     ]
+    readonly_fields = [
+        'id',
+        'friends',
+        'last_visited_on',
+        'is_private',
+    ]
