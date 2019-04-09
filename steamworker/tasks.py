@@ -8,6 +8,8 @@ from django.conf import settings
 
 from steamtail.decorators import kwarg_result
 
+from .utils import get_vanity_url
+
 
 APP_LIST_URL = 'https://api.steampowered.com/ISteamApps/GetAppList/v2/'
 APP_INFO_URL = 'https://store.steampowered.com/api/appdetails?appids={}'
@@ -32,7 +34,7 @@ def get_app_info(app_id):
         return None
 
 
-@shared_task(rate_limit='40/m')
+@shared_task(rate_limit='60/m')
 @kwarg_result(name='store_page')
 def get_store_page(app_id, max_redirects=4):
     session = requests.session()
@@ -51,8 +53,16 @@ def get_store_page(app_id, max_redirects=4):
 games_pattern = re.compile(r'\[{.*?"appid".*?}\]')
 
 
-def get_profile_games(user_id, html):
-    soup = BeautifulSoup(html, 'lxml')
+PROFILE_FRIENDS_URL = 'https://steamcommunity.com/profiles/{}/friends'
+
+
+@shared_task(rate_limit='60/m')
+def get_profile_games(user_id):
+    url = '{}games/?tab=all'.format(get_vanity_url(user_id))
+    r = requests.get(url)
+    r.raise_for_status()
+
+    soup = BeautifulSoup(r.content, 'lxml')
     if soup.select_one('.profile_private_info'):
         return dict(
             data=[],
@@ -84,37 +94,29 @@ def _is_friend_profile_private(friend_element):
     )
 
 
-def get_profile_friends(user_id, html):
-    soup = BeautifulSoup(html, 'lxml')
-    friends = []
-    for friend in soup.select('#friends_list [data-steamid]'):
-        friends.append((
-            int(friend['data-steamid']),
-            not _is_friend_profile_private(friend),
-        ))
-    return friends
-
-
-GAMES = 1
-FRIENDS = 2
-PROFILE_SECTION_URLS = {
-    GAMES:   'https://steamcommunity.com/profiles/{}/games/?tab=all',
-    FRIENDS: 'https://steamcommunity.com/profiles/{}/friends',
-}
-PROFILE_SECTION_HANDLERS = {
-    GAMES:   get_profile_games,
-    FRIENDS: get_profile_friends,
-}
-
-
-@shared_task(rate_limit='60/m')
-def get_profile_section(user_id, section):
-    """Section redirects to the correct handling function. The reason those 
-    functions aren't set up as different tasks is that we want to rate limit
-    requests to the hostname.
-    """
-    url = PROFILE_SECTION_URLS[section].format(user_id)
+@shared_task(rate_limit='100/m')
+def get_profile_friends(user_id):
+    url = PROFILE_FRIENDS_URL.format(user_id)
     r = requests.get(url)
     r.raise_for_status()
-    handler = PROFILE_SECTION_HANDLERS[section]
-    return handler(user_id, r.text)
+
+    soup = BeautifulSoup(r.content, 'lxml')
+    friends = []
+    for friend in soup.select('#friends_list [data-steamid]'):
+        is_public = not _is_friend_profile_private(friend)
+        is_ownership_public = (
+            # ownership is public when the user is in-game
+            'in-game' in friend['class']
+            # if the user is not in game, ownership should be private
+            # when the profile is private
+            or False if not is_public
+            # we can not be certain, otherwise
+            else None
+        )
+
+        friends.append((
+            int(friend['data-steamid']),
+            is_public,
+            is_ownership_public,
+        ))
+    return friends

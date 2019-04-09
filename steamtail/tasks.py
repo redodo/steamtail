@@ -97,9 +97,8 @@ def update_user_friends(user_id, max_depth=1, min_profile_delay=DEFAULT_PROFILE_
     :param min_profile_delay: the minimum delay between visits of the same profile
     """
     chain(
-        steamworker.tasks.get_profile_section.s(
+        steamworker.tasks.get_profile_friends.s(
             user_id,
-            section=steamworker.tasks.FRIENDS,
         ),
         process_user_friends.s(
             user_id,
@@ -112,18 +111,19 @@ def update_user_friends(user_id, max_depth=1, min_profile_delay=DEFAULT_PROFILE_
 @shared_task
 def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEFAULT_PROFILE_DELAY):
     # efficiently create newly discovered users
-    user_ids = friend_ids + [(user_id, None)]
-    users = {
-        user.id: user
-        for user in User.objects.filter(id__in=[u[0] for u in user_ids])
-    }
-    new_users = []
-    for id, is_public in user_ids:
-        if id not in users:
-            new_user = User(id=id, is_public=is_public)
-            new_users.append(new_user)
-            users[id] = new_user
-    User.objects.bulk_create(new_users, ignore_conflicts=True)
+    user_ids = friend_ids + [(
+        user_id,
+        len(friend_ids) != 0,
+        None,
+    )]
+    users = {}
+    for id, is_public, is_ownership_public in user_ids:
+        defaults = {'is_public': is_public}
+        if is_ownership_public is not None:
+            defaults['is_ownership_public'] = is_ownership_public
+
+        user, __ = User.objects.update_or_create(id=id, defaults=defaults)
+        users[id] = user
 
     max_last_visited_on = (
         timezone.now() - timezone.timedelta(seconds=min_profile_delay)
@@ -132,7 +132,7 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
     # create connections between current user and friends
     user = users[user_id]
 
-    for friend_id, is_public in friend_ids:
+    for friend_id, is_public, __ in friend_ids:
         friend = users[friend_id]
         try:
             user.friends.add(friend)
@@ -156,13 +156,8 @@ def process_user_friends(friend_ids, user_id, max_depth=1, min_profile_delay=DEF
 
 def update_user_apps(user_id):
     chain(
-        steamworker.tasks.get_profile_section.s(
-            user_id,
-            section=steamworker.tasks.GAMES,
-        ),
-        process_user_apps.s(
-            user_id,
-        ),
+        steamworker.tasks.get_profile_games.s(user_id),
+        process_user_apps.s(user_id),
     ).delay()
 
 
