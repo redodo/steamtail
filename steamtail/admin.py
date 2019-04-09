@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from .models import App, Tag, User
-from .tasks import update_app
+from .tasks import update_app, update_user_apps
 
 
 class AppInline(admin.TabularInline):
@@ -147,3 +147,13 @@ class UserAdmin(admin.ModelAdmin):
         'friends_last_checked_on',
         'apps_last_checked_on',
     ]
+    actions = [
+        'update_user_apps',
+    ]
+
+    def update_user_apps(self, request, queryset):
+        for user in queryset:
+            update_user_apps(user.id)
+    update_user_apps.short_description = _(
+        'Force update user apps'
+    )
