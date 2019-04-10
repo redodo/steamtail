@@ -63,7 +63,7 @@ def get_profile_games(self, user_id):
         r = requests.get(url)
         r.raise_for_status()
     except requests.HTTPError as exc:
-        if exc.code == 429:
+        if exc.response.status_code == 429:
             raise self.retry(exc=exc, countdown=30)
         else:
             raise

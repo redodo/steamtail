@@ -38,7 +38,7 @@ services:
     # access.
     steamworker:
         build: .
-        entrypoint: celery -A proj worker -Q steamworker -n steamworker@${HOSTNAME}:%h
+        entrypoint: celery -A proj worker -Q steamworker -n steamworker@%h
         command: -l info
         volumes:
             - .:/app
@@ -53,7 +53,7 @@ services:
     # The default worker processes all other tasks.
     worker:
         build: .
-        entrypoint: celery -A proj worker -n worker@${HOSTNAME}:%h
+        entrypoint: celery -A proj worker -n worker@%h
         command: -l info
         volumes:
             - .:/app
