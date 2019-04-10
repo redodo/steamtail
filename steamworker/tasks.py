@@ -36,7 +36,7 @@ def get_app_info(app_id):
 
 @shared_task(rate_limit='60/m')
 @kwarg_result(name='store_page')
-def get_store_page(app_id, max_redirects=4):
+def get_store_page(app_id, max_redirects=2):
     session = requests.session()
     session.max_redirects = max_redirects
     try:
@@ -56,11 +56,17 @@ games_pattern = re.compile(r'\[{.*?"appid".*?}\]')
 PROFILE_FRIENDS_URL = 'https://steamcommunity.com/profiles/{}/friends'
 
 
-@shared_task(rate_limit='5/m')
-def get_profile_games(user_id):
+@shared_task(bind=True, rate_limit='300/h')
+def get_profile_games(self, user_id):
     url = '{}games/?tab=all'.format(get_vanity_url(user_id))
-    r = requests.get(url)
-    r.raise_for_status()
+    try:
+        r = requests.get(url)
+        r.raise_for_status()
+    except requests.HTTPError as exc:
+        if exc.code == 429:
+            raise self.retry(exc=exc, countdown=30)
+        else:
+            raise
 
     soup = BeautifulSoup(r.content, 'lxml')
     if soup.select_one('.profile_private_info'):
