@@ -1,0 +1,86 @@
+html {
+    height: 100%;
+}
+body {
+    margin: 0;
+    padding: 20px;
+    height: 100%;
+    color: white;
+    background: #222;
+}
+
+.container {
+    margin: 0 auto;
+    width: 1000px;
+}
+
+.other-games {
+    padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.other-game-wrapper {
+    padding: 5px;
+    box-sizing: border-box;
+    flex-grow: 1;
+    flex-basis: 20%;
+    font-size: 0.8em;
+}
+.other-game-wrapper:nth-child(1),
+.other-game-wrapper:nth-child(2) {
+    flex-basis: 50%;
+    font-size: 1.4em;
+}
+.other-game-wrapper:nth-child(3),
+.other-game-wrapper:nth-child(4),
+.other-game-wrapper:nth-child(5) {
+    flex-basis: 33%;
+    font-size: 1.2em;
+}
+.other-game-wrapper:nth-child(6),
+.other-game-wrapper:nth-child(7),
+.other-game-wrapper:nth-child(8),
+.other-game-wrapper:nth-child(9) {
+    flex-basis: 25%;
+    font-size: 1.0em;
+}
+
+.selected-game {
+    margin: 0 auto;
+    flex-basis: 33%;
+    font-size: 1.2em;
+}
+
+.selected-game {
+    margin: 0 auto;
+    width: 25%;
+}
+
+.game {
+    overflow: hidden;
+    border-radius: 5px;
+    color: white;
+    text-decoration: none;
+    background: #444;
+}
+.game .image {
+    width: 100%;
+    display: block;
+}
+.game .info {
+    padding: 5px;
+}
+.game .info .title {
+    font-size: 0.8em;
+}
+.game .info .tags {
+    font-size: 0.6em;
+}
+.game .info .tag {
+    margin-right: 5px;
+    display: inline-block;
+    padding: 3px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+}

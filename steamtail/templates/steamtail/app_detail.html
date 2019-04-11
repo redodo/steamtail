@@ -1,0 +1,39 @@
+{% extends 'steamtail/base.html' %}
+
+{% block body %}
+
+<div class="container">
+
+<div class="selected-game">
+    <div class="game">
+        <img class="image" src="https://steamcdn-a.akamaihd.net/steam/apps/{{ app.id }}/header.jpg">
+        <div class="info">
+            <div class="title">{{ app.name }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="other-games">
+    {% for other_app, relevance, tags in relevant_apps %}
+    <div class="other-game-wrapper">
+        <div class="game">
+            <a href="{% url 'app_detail' other_app.id %}">
+                <img class="image" src="https://steamcdn-a.akamaihd.net/steam/apps/{{ other_app.id }}/header.jpg">
+            </a>
+            <div class="info">
+                <div class="title">{{ other_app.name }}</div>
+                <div class="tags">
+                    <span class="tag relevance">{{ relevance|floatformat:3 }}</span>
+                    {% for tag in tags %}
+                    <span class="tag">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+</div>
+
+{% endblock %}
