@@ -8,13 +8,13 @@
     <div class="game">
         <img class="image" src="https://steamcdn-a.akamaihd.net/steam/apps/{{ app.id }}/header.jpg">
         <div class="info">
-            <div class="title">{{ app.name }}</div>
+            <div class="title">{{ app.name }} ({{ operations }} datapoints)</div>
         </div>
     </div>
 </div>
 
 <div class="other-games">
-    {% for other_app, relevance, tags in relevant_apps %}
+    {% for other_app, relevance, tags, average_playtime in relevant_apps %}
     <div class="other-game-wrapper">
         <div class="game">
             <a href="{% url 'app_detail' other_app.id %}">
@@ -24,6 +24,7 @@
                 <div class="title">{{ other_app.name }}</div>
                 <div class="tags">
                     <span class="tag relevance">{{ relevance|floatformat:3 }}</span>
+                    <span class="tag">{{ average_playtime|floatformat:0 }}h</span>
                     {% for tag in tags %}
                     <span class="tag">{{ tag.name }}</span>
                     {% endfor %}

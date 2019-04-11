@@ -4,12 +4,13 @@ boto3
 celery[brotli]
 django
 django-storages
+django_neomodel
 flower
 ipython
-msgpack
 lxml
 pendulum
 psycopg2-binary
 redis
 requests
 sentry-sdk
+tqdm

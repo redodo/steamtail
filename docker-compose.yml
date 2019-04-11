@@ -78,7 +78,17 @@ services:
         environment:
             DEBUG: 0
 
+    graph:
+        image: neo4j
+        ports:
+            - "7474:7474"
+            - "7687:7687"
+        volumes:
+            - graph-data:/data
+        restart: unless-stopped
+
 volumes:
     db-data:
     mq-data:
     redis-data:
+    graph-data:

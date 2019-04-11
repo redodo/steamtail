@@ -12,6 +12,7 @@ body {
 .container {
     margin: 0 auto;
     width: 1000px;
+    max-width: 100%;
 }
 
 .other-games {
@@ -45,6 +46,11 @@ body {
     flex-basis: 25%;
     font-size: 1.0em;
 }
+@media screen and (max-width: 800px) {
+    .other-game-wrapper {
+        flex-basis: 25%;
+    }
+}
 
 .selected-game {
     margin: 0 auto;
@@ -62,7 +68,10 @@ body {
     border-radius: 5px;
     color: white;
     text-decoration: none;
-    background: #444;
+    background: linear-gradient(
+        #333,
+        #444
+    );
 }
 .game .image {
     width: 100%;

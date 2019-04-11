@@ -27,10 +27,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_neomodel',
+
     'steamtail',
+    'steamgraph',
 
     'storages',
 ]
+
+NEOMODEL_NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL', 'bolt://neo4j:admin@graph:7687')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
