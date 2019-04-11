@@ -2,7 +2,6 @@ from decimal import Decimal
 
 from django.db.models import Avg, Q
 from django.views.generic import DetailView
-from tqdm import tqdm
 
 from .models import App, UserApp
 
@@ -54,6 +53,6 @@ class AppDetail(DetailView):
 
                 apps[other_app.app] += other_app_importance * user_importance
 
-        apps = sorted(apps.items(), key=lambda i: i[1], reverse=True)[:29]
+        apps = sorted(apps.items(), key=lambda i: i[1], reverse=True)[:39]
         for app, relevance in apps:
             yield app, relevance, app.tags.all()[:5]
