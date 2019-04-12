@@ -27,12 +27,14 @@ from (
     select
     a1.app_id,
     a1.tag_id,
+    (select sum(votes) from steamtail_apptag where app_id = a1.app_id) as total,
     CAST(votes AS FLOAT) / (select sum(votes) from steamtail_apptag where app_id = a1.app_id) as share
     from steamtail_apptag a1
 ) as a2
 inner join steamtail_app A on a2.app_id = A.id
 where a2.app_id != %s
 and A.type = 'game'
+and a2.total >= 20
 group by a2.app_id
 order by diff
 limit 39

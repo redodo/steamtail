@@ -27,7 +27,7 @@
                 {% endcomment %}
                 <div class="tags">
                     {% spaceless %}
-                    <div class="tag">{{ other_app.diff|similarity|floatformat:1 }}%</div>
+                        <a class="tag" href="{{ other_app.get_absolute_url }}">{{ other_app.diff|similarity|floatformat:1 }}%</a>
                     {% for tag in other_app.tags.all|slice:":2" %}
                     <div class="tag">{{ tag.name }}</div>
                     {% endfor %}
