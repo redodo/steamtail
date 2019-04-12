@@ -37,7 +37,7 @@ and A.type = 'game'
 and a2.total >= 20
 group by a2.app_id
 order by diff
-limit 39
+limit 69
     """, [app.id, app.id])
 
     return render(request, 'steamtail/app_relevant.html', dict(

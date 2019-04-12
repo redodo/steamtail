@@ -9,7 +9,7 @@
     <div class="game">
         <img class="image" src="https://steamcdn-a.akamaihd.net/steam/apps/{{ app.id }}/header.jpg">
         <div class="info">
-            <div class="title">{{ app.name }}</div>
+            <a class="title" href="{{ app.get_absolute_url }}">{{ app.name }}</a>
         </div>
     </div>
 </div>
