@@ -1,0 +1,25 @@
+<table class="table table-sm table-dark table-striped">
+    <thead>
+        <tr>
+            <th>Tag</th>
+            <th class="text-right">Votes</th>
+            <th class="text-right">Share</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tag in tags %}
+        <tr>
+            <td><abbr title="{{ tag.tag.id }}">{{ tag.tag.name }}</abbr></td>
+            <td class="text-right text-monospace">{{ tag.votes }}</td>
+            <td class="text-right text-monospace">{{ tag.share|floatformat:1 }}%</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Total</th>
+            <th class="text-right text-monospace">{{ total }}</th>
+            <th class="text-right text-monospace">100%</th>
+        </tr>
+    </tfoot>
+</table>

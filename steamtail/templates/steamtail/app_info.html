@@ -1,0 +1,30 @@
+{% extends 'steamtail/base.html' %}
+
+{% block body %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="game">
+                <img class="image" src="https://steamcdn-a.akamaihd.net/steam/apps/{{ app.id }}/header.jpg">
+                <div class="info">
+                    <div class="title">{{ app.name }}</div>
+                </div>
+            </div>
+            {% include "steamtail/components/tags-table.html" with total=tag_info.1 tags=tag_info.0 %}
+        </div>
+        {% if other %}
+        <div class="col">
+            <div class="game">
+                <img class="image" src="https://steamcdn-a.akamaihd.net/steam/apps/{{ other.id }}/header.jpg">
+                <div class="info">
+                    <div class="title">{{ other.name }}</div>
+                </div>
+            </div>
+            {% include "steamtail/components/tags-table.html" with total=other_tag_info.1 tags=other_tag_info.0 %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

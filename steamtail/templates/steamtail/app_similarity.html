@@ -1,0 +1,57 @@
+{% extends 'steamtail/base.html' %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ a.id }}/header.jpg"><br>
+        <img src="https://steamcdn-a.akamaihd.net/steam/apps/{{ b.id }}/header.jpg"><br>
+    </div>
+    <div class="text-center">
+        <h1>{{ similarity|floatformat:1 }}% similar</h1>
+    </div>
+    <table class="table table-sm table-dark table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th colspan="2" class="text-center">
+                    {{ a.name }}
+                </th>
+                <th colspan="2" class="text-center">
+                    {{ b.name }}
+                </th>
+                <th></th>
+            </tr>
+            <tr>
+                <th>Tag</th>
+                <th class="text-right">Votes</th>
+                <th class="text-right">Share</th>
+                <th class="text-right">Votes</th>
+                <th class="text-right">Share</th>
+                <th class="text-right">Diff</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table %}
+            <tr>
+                <td><abbr title="{{ row.tag.id }}">{{ row.tag.name }}</abbr></td>
+                <td class="text-right text-monospace">{{ row.a_votes }}</td>
+                <td class="text-right text-monospace">{{ row.a_share|floatformat:1 }}%</td>
+                <td class="text-right text-monospace">{{ row.b_votes }}</td>
+                <td class="text-right text-monospace">{{ row.b_share|floatformat:1 }}</td>
+                <td class="text-right text-monospace">{{ row.diff|floatformat:1 }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Total</th>
+                <th class="text-right text-monospace">{{ a_votes }}</th>
+                <th class="text-right text-monospace">100%</th>
+                <th class="text-right text-monospace">{{ b_votes }}</th>
+                <th class="text-right text-monospace">100%</th>
+                <th class="text-right text-monospace">{{ diff|floatformat:1 }}%</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% endblock %}

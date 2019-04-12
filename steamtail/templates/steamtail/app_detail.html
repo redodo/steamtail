@@ -8,7 +8,7 @@
     <div class="game">
         <img class="image" src="https://steamcdn-a.akamaihd.net/steam/apps/{{ app.id }}/header.jpg">
         <div class="info">
-            <div class="title">{{ app.name }} ({{ operations }} datapoints)</div>
+            <div class="title">{{ app.name }}{% if datapoints %}({{ operations }} datapoints){% endif %}</div>
         </div>
     </div>
 </div>
