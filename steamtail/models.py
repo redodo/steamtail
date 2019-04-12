@@ -123,6 +123,7 @@ class AppTag(models.Model):
     )
 
     class Meta:
+        ordering = ['-votes']
         unique_together = ('app', 'tag')
 
 

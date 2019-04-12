@@ -70,9 +70,10 @@ body {
     color: white;
     text-decoration: none;
     background: linear-gradient(
-        #333,
-        #444
+        #222,
+        #333
     );
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.4);
 }
 .game .image {
     width: 100%;
@@ -90,9 +91,10 @@ body {
     font-size: 0.6em;
 }
 .game .info .tag {
-    margin-right: 5px;
+    margin-right: 3px;
     display: inline-block;
-    padding: 3px;
+    padding: 1px 3px;
     border-radius: 3px;
-    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.05);
 }

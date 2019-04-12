@@ -1,4 +1,5 @@
 {% extends 'steamtail/base.html' %}
+{% load steamtail %}
 
 {% block body %}
 
@@ -21,7 +22,17 @@
                 <img class="image" src="https://steamcdn-a.akamaihd.net/steam/apps/{{ other_app.id }}/header.jpg">
             </a>
             <div class="info">
+                {% comment %}
                 <a class="title" href="{{ other_app.get_absolute_url }}">{{ other_app.name }}</a>
+                {% endcomment %}
+                <div class="tags">
+                    {% spaceless %}
+                    <div class="tag">{{ other_app.diff|similarity|floatformat:1 }}%</div>
+                    {% for tag in other_app.tags.all|slice:":2" %}
+                    <div class="tag">{{ tag.name }}</div>
+                    {% endfor %}
+                    {% endspaceless %}
+                </div>
             </div>
         </div>
     </div>
