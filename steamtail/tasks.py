@@ -60,12 +60,16 @@ def process_app_data(app_id, app_info=None, store_page=None):
         update_app_tags(app, tags)
 
         # Update review counts
-        app.positive_reviews = int(soup.select_one(
-            'label[for=review_type_positive] .user_reviews_count'
-        ).text.strip('()').replace(',', ''))
-        app.negative_reviews = int(soup.select_one(
-            'label[for=review_type_negative] .user_reviews_count'
-        ).text.strip('()').replace(',', ''))
+        try:
+            app.positive_reviews = int(soup.select_one(
+                'label[for=review_type_positive] .user_reviews_count'
+            ).text.strip('()').replace(',', ''))
+            app.negative_reviews = int(soup.select_one(
+                'label[for=review_type_negative] .user_reviews_count'
+            ).text.strip('()').replace(',', ''))
+        except (AttributeError, ValueError):
+            # there aren't any reviews
+            pass
 
     app.unknown = app_info is None
     app.raw_info = app_info

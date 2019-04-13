@@ -19,6 +19,9 @@
                 <a class="title" href="{{ app.get_absolute_url }}">{{ app.name }}</a>
                 <div class="tags">
                     {% spaceless %}
+                    {% if app.review_score %}
+                        <div class="tag">{{ app.review_score|perc:0 }}</div>
+                    {% endif %}
                     {% for tag in app.apptag_set.all|slice:":4" %}
                     <div class="tag">{{ tag.tag.name }}</div>
                     {% endfor %}

@@ -16,8 +16,8 @@ def similarity(diff):
 
 
 @register.filter
-def perc(value):
-    return value * 100
+def perc(value, decimals=0):
+    return '{}%'.format(round(value * 100, decimals))
 
 
 @register.simple_tag(takes_context=True)
