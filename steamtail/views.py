@@ -1,7 +1,7 @@
 from decimal import Decimal
 
-from django.db.models import Avg, Q, Func, F, Variance, Sum, Value, FloatField
-from django.db.models.functions import Cast
+from django.db.models import Avg, Q, Func, F, Variance, Sum, Value, FloatField, Prefetch
+from django.db.models.functions import Abs, Cast, Coalesce
 from django.views.generic import DetailView
 from django.shortcuts import render
 
@@ -11,34 +11,43 @@ from .models import App, AppTag, UserApp
 def apps_like_this(request, pk_a):
     app = App.objects.get(id=pk_a)
 
+    tag_filters = list(request.GET.getlist('tag'))
 
+    # Retrieves apps that have the least difference in tag makeup
     similar_apps = App.objects.raw("""
-SELECT
-a2.app_id as id,
-sum(
-abs(a2.share - coalesce(
-    (select
-    CAST(a.votes AS FLOAT) / (select sum(votes) from steamtail_apptag where app_id = a.app_id)
-    from steamtail_apptag a
-    where app_id = %s and tag_id=a2.tag_id), 0
-))
-) as diff
-from (
-    select
-    a1.app_id,
-    a1.tag_id,
-    (select sum(votes) from steamtail_apptag where app_id = a1.app_id) as total,
-    CAST(votes AS FLOAT) / (select sum(votes) from steamtail_apptag where app_id = a1.app_id) as share
-    from steamtail_apptag a1
-) as a2
-inner join steamtail_app A on a2.app_id = A.id
-where a2.app_id != %s
-and A.type = 'game'
-and a2.total >= 20
-group by a2.app_id
-order by diff
-limit 69
-    """, [app.id, app.id])
+        SELECT
+            a.id,
+            a.name,
+            (
+                SELECT SUM(ABS(
+                    t.share - COALESCE(
+                        -- get the tag share of the selected app
+                        (SELECT share FROM steamtail_apptag WHERE app_id = %s and tag_id = t.tag_id),
+                        -- or zero if the selected app does not have it
+                        0
+                    )
+                ))
+                FROM steamtail_apptag t
+                WHERE t.app_id = a.id
+            ) AS diff
+        FROM steamtail_app a
+        WHERE
+            a.id != %s
+            AND a.type = 'game'
+            AND a.tag_votes >= 20
+            {}
+        ORDER BY diff ASC
+        LIMIT 89
+    """.format(
+        'AND ARRAY[{}]::bigint[] <@ ARRAY(SELECT DISTINCT tag_id FROM steamtail_apptag WHERE app_id = a.id)'.format(
+            ','.join(str(int(tag)) for tag in tag_filters)
+        )
+        if tag_filters
+        else ''
+    ), [app.id, app.id]).prefetch_related(
+        'apptag_set',
+        'apptag_set__tag',
+    )
 
     return render(request, 'steamtail/app_relevant.html', dict(
         app=app,

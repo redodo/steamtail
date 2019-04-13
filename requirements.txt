@@ -3,7 +3,9 @@ beautifulsoup4
 boto3
 celery[brotli]
 django
+django-debug-toolbar
 django-storages
+django-sql-utils
 django_neomodel
 flower
 ipython

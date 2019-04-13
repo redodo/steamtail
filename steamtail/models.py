@@ -69,6 +69,11 @@ class App(models.Model):
         null=True,
     )
 
+    tag_votes = models.PositiveIntegerField(
+        _('total number of votes on tags'),
+        null=True,
+    )
+
     class Meta:
         ordering = ['id', 'name']
         verbose_name = _('app')
@@ -116,6 +121,10 @@ class AppTag(models.Model):
     )
     votes = models.PositiveIntegerField(
         _('votes'),
+    )
+    share = models.FloatField(
+        _('share of votes'),
+        null=True,
     )
     browseable = models.BooleanField(
         _('browseable'),
