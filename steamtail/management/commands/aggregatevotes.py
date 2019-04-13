@@ -13,7 +13,8 @@ class Command(BaseCommand):
                 "SET tag_votes = ("
                     "SELECT SUM(votes) FROM steamtail_apptag t "
                     "WHERE t.app_id = a.id"
-                ")"
+                "),"
+                "review_score = CAST(a.positive_reviews AS FLOAT) / (a.positive_reviews + a.negative_reviews)"
             )
             print('Updating tag shares...')
             cursor.execute(

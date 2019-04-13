@@ -44,12 +44,9 @@ def update_app_tags(app, tags):
 app_tags_pattern = re.compile(r'\[{.*?"tagid".*?}\]')
 
 
-def find_app_tags(store_page):
-    if store_page is not None:
-        soup = BeautifulSoup(store_page, 'lxml')
-
-        for script in soup.select('script:not([src])'):
-            match = app_tags_pattern.search(script.text)
-            if match:
-                return json.loads(match.group())
+def find_app_tags(soup):
+    for script in soup.select('script:not([src])'):
+        match = app_tags_pattern.search(script.text)
+        if match:
+            return json.loads(match.group())
     return []

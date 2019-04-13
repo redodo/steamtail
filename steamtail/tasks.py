@@ -2,6 +2,7 @@ import json
 from decimal import Decimal
 
 import pendulum
+from bs4 import BeautifulSoup
 from celery import chain, chord, shared_task
 from django.db import IntegrityError, transaction
 from django.db.models import Q
@@ -50,10 +51,21 @@ def process_app_data(app_id, app_info=None, store_page=None):
     store_page = store_page or app.raw_store_page
 
     if store_page is not None:
-        store_page = store_page.encode('utf-8')
+        if not isinstance(store_page, bytes):
+            store_page = store_page.encode('utf-8')
+        soup = BeautifulSoup(store_page, 'lxml')
+
         # Update tags
-        tags = find_app_tags(store_page)
+        tags = find_app_tags(soup)
         update_app_tags(app, tags)
+
+        # Update review counts
+        app.positive_reviews = int(soup.select_one(
+            'label[for=review_type_positive] .user_reviews_count'
+        ).text.strip('()').replace(',', ''))
+        app.negative_reviews = int(soup.select_one(
+            'label[for=review_type_negative] .user_reviews_count'
+        ).text.strip('()').replace(',', ''))
 
     app.unknown = app_info is None
     app.raw_info = app_info

@@ -74,6 +74,19 @@ class App(models.Model):
         null=True,
     )
 
+    positive_reviews = models.PositiveIntegerField(
+        _('positive review count'),
+        null=True,
+    )
+    negative_reviews = models.PositiveIntegerField(
+        _('negative review count'),
+        null=True,
+    )
+    review_score = models.FloatField(
+        _('review score'),
+        null=True,
+    )
+
     class Meta:
         ordering = ['id', 'name']
         verbose_name = _('app')

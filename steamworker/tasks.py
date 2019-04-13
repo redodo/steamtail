@@ -41,7 +41,11 @@ def get_store_page(app_id, max_redirects=2):
     session.max_redirects = max_redirects
     try:
         url = STORE_PAGE_URL.format(app_id)
-        r = session.get(url)
+        r = session.get(url, cookies=dict(
+            birthtime='0',
+            lastagecheckage='1-0-1970',
+            wants_mature_content='1',
+        ))
         r.raise_for_status()
     except requests.TooManyRedirects:
         return None
