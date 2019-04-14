@@ -64,21 +64,15 @@ class App(models.Model):
         null=True,  # default is unknown
     )
 
-    # Raw unprocessed data gathered from Steam.
-    raw_info = JSONField(
-        _('raw app info'),
-        null=True,
-    )
-    raw_store_page = models.BinaryField(
-        _('raw store page'),
-        null=True,
-    )
-
     tag_votes = models.PositiveIntegerField(
         _('total number of votes on tags'),
         null=True,
     )
 
+    total_reviews = models.PositiveIntegerField(
+        _('total review count'),
+        null=True,
+    )
     positive_reviews = models.PositiveIntegerField(
         _('positive review count'),
         null=True,
@@ -91,6 +85,12 @@ class App(models.Model):
         _('review score'),
         null=True,
     )
+
+    def save(self, *args, **kwargs):
+        if self.positive_reviews or self.negative_reviews:
+            self.total_reviews = self.positive_reviews + self.negative_reviews
+            self.review_score = self.positive_reviews / self.total_reviews
+        return super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['id', 'name']

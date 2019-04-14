@@ -39,6 +39,7 @@ services:
     steamworker:
         build: .
         entrypoint: celery -A proj worker -Q steamworker -n steamworker@%h
+        hostname: localhost
         command: -l info
         volumes:
             - .:/app
@@ -54,6 +55,7 @@ services:
     worker:
         build: .
         entrypoint: celery -A proj worker -n worker@%h
+        hostname: localhost
         command: -l info
         volumes:
             - .:/app

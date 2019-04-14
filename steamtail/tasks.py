@@ -22,37 +22,26 @@ from .utils import (
 @shared_task
 def update_all_apps():
     init_apps()
-    for app in App.objects.filter(Q(unknown=False) | Q(unknown=None)):
+    for app in App.objects.exclude(unknown=True):
         update_app(app)
 
 
-def update_app(app, refresh=True):
-    chord_tasks = []
-    if refresh or app.raw_info is None:
-        chord_tasks.append(
-            steamworker.tasks.get_app_info.s(app.id)
-        )
-    if refresh or app.raw_store_page is None:
-        chord_tasks.append(
-            steamworker.tasks.get_store_page.s(app.id)
-        )
-    process_app_data_task = process_app_data.s(app.id)
-    if chord_tasks:
-        chord(chord_tasks)(process_app_data_task)
-    else:
-        process_app_data_task.delay()
+def update_app(app):
+    chord([
+        steamworker.tasks.get_app_info.s(app.id),
+        steamworker.tasks.get_store_page.s(app.id),
+    ])(
+        process_app_data.s(app.id)
+    )
 
 
 @shared_task
 @kwarg_inputs
-def process_app_data(app_id, app_info=None, store_page=None):
+def process_app_data(app_id, app_info, store_page):
     app = App.objects.get(id=app_id)
-    app_info = app_info or app.raw_info
-    store_page = store_page or app.raw_store_page
 
     if store_page is not None:
-        if not isinstance(store_page, bytes):
-            store_page = store_page.encode('utf-8')
+        store_page = store_page.encode('utf-8')
         soup = BeautifulSoup(store_page, 'lxml')
 
         # Update tags
@@ -72,8 +61,6 @@ def process_app_data(app_id, app_info=None, store_page=None):
             pass
 
     app.unknown = app_info is None
-    app.raw_info = app_info
-    app.raw_store_page = store_page
 
     if app_info is not None:
         # Fields that are always in app_info
