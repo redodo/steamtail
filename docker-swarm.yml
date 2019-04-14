@@ -68,7 +68,7 @@ services:
     steamworker:
         image: redodo/steamtail
         entrypoint: celery -A proj worker -Q steamworker -n steamworker@%h
-        hostname: {{.Node.Hostname}}
+        hostname: "{{.Node.Hostname}}"
         command: -l info
         depends_on:
             - mq

@@ -8,6 +8,12 @@ from django.shortcuts import render
 from .models import App, AppTag, UserApp
 
 
+
+class AppConcept(DetailView):
+    model = App
+    template_name = 'steamtail/app_concept.html'
+
+
 def apps_like_this(request, pk_a):
     app = App.objects.get(id=pk_a)
 

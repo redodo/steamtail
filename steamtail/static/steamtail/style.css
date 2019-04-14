@@ -99,3 +99,104 @@ body {
     color: white;
     background: linear-gradient(135deg, #67c1f5 0%,#417a9b 100%);
 }
+
+
+
+body {
+    background: white;
+}
+
+.ngame {
+    color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.4);
+    background: #444;
+}
+
+.ngame__header {
+    position: relative;
+}
+
+.ngame__image {
+    width: 100%;
+}
+
+.ngame__overlay {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 5px;
+    position: absolute;
+    text-align: right;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ngame__score {
+    color: black;
+    display: inline-block;
+    font-size: 0.75em;
+    line-height: 1;
+    padding: 2px 3px;
+    border-radius: 4px;
+    background: white;
+    font-family: B612;
+}
+
+.ngame__info {
+    padding: 5px;
+    background: linear-gradient(
+        #345,
+        50%,
+        #234
+    );
+}
+
+.ngame__name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.ngame__tags {
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    margin: -5px;
+    padding: 5px 0 5px 5px;
+    font-size: 0em;
+}
+
+.ngame__tags .ntag {
+    margin-right: 3px;
+
+    color: rgba(255, 255, 255, 1);
+    background: linear-gradient(
+        40deg,
+        rgba(211, 238, 255, 0.5),
+        rgba(221, 238, 255, 0.3)
+    );
+}
+
+.ngame__tags-fader {
+    position: absolute;
+    width: 60px;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(90deg, transparent, #234);
+}
+
+.ntag {
+    display: inline-block;
+
+    padding: 0.25em 0.3em;
+    border-radius: 4px;
+
+    font-size: 0.75rem;
+    line-height: 1;
+}

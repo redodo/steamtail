@@ -1,0 +1,14 @@
+{% extends 'steamtail/base.html' %}
+{% block body %}
+<div class="row">
+    <div class="col-2">
+        {% include "steamtail/game.html" with app=app exclude_name=True only %}
+    </div>
+    <div class="col-3">
+        {% include "steamtail/game.html" with app=app only %}
+    </div>
+    <div class="col-4">
+        {% include "steamtail/game.html" with app=app only %}
+    </div>
+</div>
+{% endblock %}

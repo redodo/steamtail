@@ -1,4 +1,5 @@
 import urllib
+from hashlib import sha1
 
 from django import template
 
@@ -17,7 +18,12 @@ def similarity(diff):
 
 @register.filter
 def perc(value, decimals=0):
-    return '{}%'.format(round(value * 100, decimals))
+    return '{{:.{}f}}%'.format(decimals).format(value * 100)
+
+
+@register.filter
+def points(value, decimals=0):
+    return '{{:.{}f}}'.format(decimals).format(value * 100)
 
 
 @register.simple_tag(takes_context=True)
@@ -34,6 +40,11 @@ def toggle_param(context, param, value):
     return urllib.parse.urlunparse(parts)
 
 
+@register.filter
+def select_related(queryset, fields):
+    return queryset.select_related(*fields.split(' '))
+
+
 @register.simple_tag(takes_context=True)
 def if_in_query(context, param, value, if_true, if_false=''):
     parts = list(urllib.parse.urlparse(context.request.get_full_path()))
@@ -41,3 +52,13 @@ def if_in_query(context, param, value, if_true, if_false=''):
     if (param, str(value)) in query:
         return if_true
     return if_false
+
+
+@register.filter
+def div(dividend, divisor):
+    return dividend / divisor
+
+
+@register.filter
+def hash(string, length=40):
+    return sha1(string.encode('utf-8')).hexdigest()[:length]
