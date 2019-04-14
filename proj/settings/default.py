@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     'steamgraph',
 
     'storages',
-    'debug_toolbar',
 ]
 
 NEOMODEL_NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL', 'bolt://neo4j:admin@graph:7687')
@@ -43,7 +42,6 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -52,6 +50,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+if DEBUG:
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 WSGI_APPLICATION = 'proj.wsgi.application'
 ROOT_URLCONF = 'proj.urls'

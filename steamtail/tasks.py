@@ -92,10 +92,14 @@ def process_app_data(app_id, app_info=None, store_page=None):
         if 'release_date' in app_info:
             app.coming_soon = app_info.get('coming_soon', False)
             if app_info['release_date']['date']:
-                app.release_date = pendulum.parse(
-                    app_info['release_date']['date'],
-                    strict=False,
-                )
+                app.release_date_text = app_info['release_date']['date']
+                try:
+                    app.release_date = pendulum.parse(
+                        app.release_date_text,
+                        strict=False,
+                    )
+                except ValueError:
+                    pass
     app.save()
 
 

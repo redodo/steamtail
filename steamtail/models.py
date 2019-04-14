@@ -47,6 +47,11 @@ class App(models.Model):
         _('release date'),
         null=True,
     )
+    release_date_text = models.CharField(
+        _('release date text'),
+        max_length=255,
+        null=True,
+    )
     tags = models.ManyToManyField(
         'Tag',
         through='AppTag',
