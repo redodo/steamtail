@@ -34,9 +34,9 @@ def get_app_info(app_id):
         return None
 
 
-@shared_task(rate_limit='60/m')
+@shared_task(bind=True, rate_limit='60/m')
 @kwarg_result(name='store_page')
-def get_store_page(app_id, max_redirects=2):
+def get_store_page(self, app_id, max_redirects=2):
     session = requests.session()
     session.max_redirects = max_redirects
     try:
@@ -49,6 +49,12 @@ def get_store_page(app_id, max_redirects=2):
         r.raise_for_status()
     except requests.TooManyRedirects:
         return None
+    except requests.HTTPError as exc:
+        if exc.response.status_code >= 500:
+            # The server is having problems.
+            raise self.retry(exc=exc, countdown=60)
+        else:
+            raise
     if '/app/' not in r.url:
         return None
     return r.text
@@ -68,6 +74,7 @@ def get_profile_games(self, user_id):
         r.raise_for_status()
     except requests.HTTPError as exc:
         if exc.response.status_code == 429:
+            # Rate limit exceeded.
             raise self.retry(exc=exc, countdown=30)
         else:
             raise
