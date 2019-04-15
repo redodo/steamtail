@@ -20,6 +20,15 @@
         {% if not exclude_tags %}
         <div class="game__tags">
             <span class="tag {% if size == "small" %} tag--small{% endif %}">{{ app.name }}</span>
+            <span class="tag tag--green{% if size == "small" %} tag--small{% endif %}">
+                {% if app.review_score %}
+                {{ app.review_score|perc }}
+                {% elif app.coming_soon or not app.release_date %}
+                    Coming Soon
+                    {% else %}
+                    No Reviews
+                {% endif %}
+            </span>
             {% with tags=app.apptag_set.all|select_related:"tag"|slice:":12" %}
                 {% with top=tags|first %}
                     {% for tag in tags %}
