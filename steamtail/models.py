@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -99,6 +101,9 @@ class App(models.Model):
 
     def __str__(self):
         return self.name
+
+    def cleaned_name(self):
+        return re.sub('[®©™]', '', self.name)
 
     def get_absolute_url(self):
         return 'https://store.steampowered.com/app/{}/'.format(self.id)

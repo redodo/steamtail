@@ -1,10 +1,10 @@
 {% load steamtail %}
-<div class="game">
+<a class="game" href="{% url 'more_like_this' app.id %}">
     <div class="game__header">
 
         {% if size == "large" %}
         {# TODO: the capsule image sometimes does not exist #}
-        <img class="game__image" src="{{ app.get_image_url }}">
+        <img class="game__image" src="{{ app.get_large_image_url }}">
         {% elif size == "small" %}
         <img class="game__image" src="{{ app.get_small_image_url }}">
         {% else %}
@@ -19,17 +19,25 @@
 
         {% if not exclude_tags %}
         <div class="game__tags">
-            <span class="tag {% if size == "small" %} tag--small{% endif %}">{{ app.name }}</span>
+            <span class="tag {% if size == "small" %} tag--small{% endif %} game__name">{{ app.cleaned_name }}</span>
+            {% if app.review_score %}
+            {% comment %}
+            {% with r=app.review_score %}
+            <span class="tag game__rating {% if r >= .9 %}tag--green{% elif r >= .6 %}tag--yellow{% else %}tag--red{% endif %}{% if size == "small" %} tag--small{% endif %}">
+                {{ app.review_score|points }}<small>%</small>
+            </span>
+            {% endwith %}
+            {% endcomment %}
+            {% else %}
             <span class="tag tag--green{% if size == "small" %} tag--small{% endif %}">
-                {% if app.review_score %}
-                {{ app.review_score|perc }}
-                {% elif app.coming_soon or not app.release_date %}
-                    Coming Soon
-                    {% else %}
-                    No Reviews
+                {% if app.coming_soon or not app.release_date %}
+                Coming Soon
+                {% else %}
+                No Reviews
                 {% endif %}
             </span>
-            {% with tags=app.apptag_set.all|select_related:"tag"|slice:":12" %}
+            {% endif %}
+            {% with tags=app.apptag_set.all|select_related:"tag"|slice:":6" %}
                 {% with top=tags|first %}
                     {% for tag in tags %}
                     <span title="{{ tag.votes }} votes ({{ tag.share|perc }})" class="tag tag--blue{% if size == "small" %} tag--small{% endif %}" style="opacity:{{ tag.share|div:top.share|safe }}">{{ tag.tag.name }}</span>
@@ -41,4 +49,4 @@
         {% endif %}
 
     </div>
-</div>
+</a>

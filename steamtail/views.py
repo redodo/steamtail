@@ -82,9 +82,9 @@ def apps_like_this(request, pk_a):
         'apptag_set__tag',
     )
 
-    return render(request, 'steamtail/app_relevant.html', dict(
+    return render(request, 'steamtail/app_concept.html', dict(
         app=app,
-        similar_apps=similar_apps,
+        app_list=similar_apps,
     ))
 
 
