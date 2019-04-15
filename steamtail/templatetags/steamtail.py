@@ -26,6 +26,11 @@ def points(value, decimals=0):
     return '{{:.{}f}}'.format(decimals).format(value * 100)
 
 
+@register.filter
+def to_list(value):
+    return list(value)
+
+
 @register.simple_tag(takes_context=True)
 def toggle_param(context, param, value):
     parts = list(urllib.parse.urlparse(context.request.get_full_path()))

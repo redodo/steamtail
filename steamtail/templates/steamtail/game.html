@@ -37,7 +37,7 @@
                 {% endif %}
             </span>
             {% endif %}
-            {% with tags=app.apptag_set.all|select_related:"tag"|slice:":6" %}
+            {% with tags=app.apptag_set.all|to_list %}
                 {% with top=tags|first %}
                     {% for tag in tags %}
                     <span title="{{ tag.votes }} votes ({{ tag.share|perc }})" class="tag tag--blue{% if size == "small" %} tag--small{% endif %}" style="opacity:{{ tag.share|div:top.share|safe }}">{{ tag.tag.name }}</span>

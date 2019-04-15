@@ -42,7 +42,10 @@ class AppConcept(ListView):
 
 
 def apps_like_this(request, pk_a):
-    app = App.objects.get(id=pk_a)
+    app = App.objects.filter(id=pk_a).prefetch_related(
+        'apptag_set',
+        'apptag_set__tag',
+    ).first()
 
     tag_filters = list(request.GET.getlist('tag'))
 
@@ -51,6 +54,9 @@ def apps_like_this(request, pk_a):
         SELECT
             a.id,
             a.name,
+            a.review_score,
+            a.release_date,
+            a.coming_soon,
             (
                 SELECT SUM(ABS(
                     t.share - COALESCE(
