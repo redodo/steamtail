@@ -63,6 +63,13 @@ def process_app_data(app_id, app_info, store_page):
     app.unknown = app_info is None
 
     if app_info is not None:
+        if app_info['steam_appid'] != app_id:
+            # This app is likely redirecting to its parent app and
+            # not giving accurate information. It is deleted to prevent
+            # duplicate apps.
+            app.delete()
+            return
+
         # Fields that are always in app_info
         app.type = app_info.get('type')
         app.name = app_info.get('name')
