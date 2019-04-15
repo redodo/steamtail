@@ -16,11 +16,18 @@ APP_INFO_URL = 'https://store.steampowered.com/api/appdetails?appids={}'
 STORE_PAGE_URL = 'https://store.steampowered.com/app/{}/'
 
 
-@shared_task(rate_limit='40/m')
+@shared_task(bind=True, rate_limit='40/m')
 @kwarg_result(name='app_info')
-def get_app_info(app_id):
+def get_app_info(self, app_id):
     url = APP_INFO_URL.format(app_id)
-    r = requests.get(url)
+    try:
+        r = requests.get(url)
+        r.raise_for_status()
+    except requests.HTTPError as exc:
+        if exc.response.status_code == 429 or exc.response.status_code >= 500:
+            raise self.retry(exc=exc, countdown=60)
+        else:
+            raise
 
     # May raise a JSONDecodeError
     data = r.json()
