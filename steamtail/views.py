@@ -2,16 +2,43 @@ from decimal import Decimal
 
 from django.db.models import Avg, Q, Func, F, Variance, Sum, Value, FloatField, Prefetch
 from django.db.models.functions import Abs, Cast, Coalesce
-from django.views.generic import DetailView
+from django.views.generic import DetailView, ListView
 from django.shortcuts import render
 
 from .models import App, AppTag, UserApp
 
 
 
-class AppConcept(DetailView):
+class AppConcept(ListView):
     model = App
     template_name = 'steamtail/app_concept.html'
+    paginate_by = 29
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(id__in=[
+            359550,
+            620,
+            440,
+            693700,
+            558990,
+            370360,
+            768200,
+            220,
+            289070,
+            218620,
+            730,
+            570,
+            677180,
+            346110,
+            858210,
+            22380,
+            377160,
+        ]).order_by('-review_score').prefetch_related(
+            'apptag_set',
+            'apptag_set__tag',
+        )
+        return qs
 
 
 def apps_like_this(request, pk_a):

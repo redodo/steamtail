@@ -103,6 +103,18 @@ class App(models.Model):
     def get_absolute_url(self):
         return 'https://store.steampowered.com/app/{}/'.format(self.id)
 
+    def get_image_url(self):
+        return 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header.jpg'.format(self.id)
+
+    def get_large_image_url(self):
+        return 'https://steamcdn-a.akamaihd.net/steam/apps/{}/capsule_616x353.jpg'.format(self.id)
+
+    def get_small_image_url(self):
+        return 'https://steamcdn-a.akamaihd.net/steam/apps/{}/header_292x136.jpg'.format(self.id)
+
+    def get_background_image_url(self):
+        return 'https://steamcdn-a.akamaihd.net/steam/apps/{}/page_bg_generated_v6b.jpg'.format(self.id)
+
 
 class Tag(models.Model):
     id = models.BigIntegerField(

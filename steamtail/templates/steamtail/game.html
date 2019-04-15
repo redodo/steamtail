@@ -1,31 +1,35 @@
 {% load steamtail %}
-{# django template #}
-{% spaceless %}
-<div class="ngame game">
-    <div class="ngame__header">
-        <img class="ngame__image" src="https://steamcdn-a.akamaihd.net/steam/apps/{{ app.id }}/header.jpg">
-        <div class="ngame__overlay">
-            {% if app.review_score %}
-            <div class="ngame__score">{{ app.review_score|points }}</div>
-            {% endif %}
-        </div>
-    </div>
-    <div class="ngame__info">
-        {% if not exclude_name %}
-        <div class="ngame__name">{{ app.name }}</div>
+<div class="game">
+    <div class="game__header">
+
+        {% if size == "large" %}
+        {# TODO: the capsule image sometimes does not exist #}
+        <img class="game__image" src="{{ app.get_image_url }}">
+        {% elif size == "small" %}
+        <img class="game__image" src="{{ app.get_small_image_url }}">
+        {% else %}
+        <img class="game__image" src="{{ app.get_image_url }}">
         {% endif %}
+
+        <div class="game__overlay">
+        </div>
+
+    </div>
+    <div class="game__info">
+
         {% if not exclude_tags %}
-        <div class="ngame__tags">
+        <div class="game__tags">
+            <span class="tag {% if size == "small" %} tag--small{% endif %}">{{ app.name }}</span>
             {% with tags=app.apptag_set.all|select_related:"tag"|slice:":12" %}
                 {% with top=tags|first %}
                     {% for tag in tags %}
-                    <div class="ntag" style="opacity:{{ tag.share|div:top.share|safe }}">{{ tag.tag.name }}</div>
+                    <span title="{{ tag.votes }} votes ({{ tag.share|perc }})" class="tag tag--blue{% if size == "small" %} tag--small{% endif %}" style="opacity:{{ tag.share|div:top.share|safe }}">{{ tag.tag.name }}</span>
                     {% endfor %}
                 {% endwith %}
             {% endwith %}
-            <div class="ngame__tags-fader"></div>
+            <div class="game__tags-fader"></div>
         </div>
         {% endif %}
+
     </div>
 </div>
-{% endspaceless %}

@@ -8,5 +8,5 @@ urlpatterns = [
     path('app/<pk>/info/<other>/', views.AppInfo.as_view(), name='app_info_other'),
     path('sim/<pk_a>/<pk_b>/', views.app_similarity),
     path('sim/<pk_a>/', views.apps_like_this, name='more_like_this'),
-    path('concept/<pk>/', views.AppConcept.as_view(), name='app_concept'),
+    path('concept/', views.AppConcept.as_view(), name='app_concept'),
 ]
