@@ -10,11 +10,7 @@
     </div>
     <div class="grid">
         {% for app in app_list %}
-            {% if forloop.counter <= 2 %}
-            <div class="grid__cell grid__cell--1/2">
-                {% include "steamtail/game.html" with app=app only %}
-            </div>
-            {% elif forloop.counter <= 5 %}
+            {% if forloop.counter <= 6 %}
             <div class="grid__cell grid__cell--1/3">
                 {% include "steamtail/game.html" with app=app only %}
             </div>

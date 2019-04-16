@@ -52,29 +52,47 @@ def apps_like_this(request, pk_a):
     # Retrieves apps that have the least difference in tag makeup
     similar_apps = App.objects.raw("""
         SELECT
-            a.id,
-            a.name,
-            a.review_score,
-            a.release_date,
-            a.coming_soon,
-            (
-                SELECT SUM(ABS(
-                    t.share - COALESCE(
-                        -- get the tag share of the selected app
-                        (SELECT share FROM steamtail_apptag WHERE app_id = %s and tag_id = t.tag_id),
-                        -- or zero if the selected app does not have it
-                        0
-                    )
-                ))
+            *
+        FROM (
+            WITH selected_app_tags AS (
+                SELECT t.tag_id, t.share
                 FROM steamtail_apptag t
-                WHERE t.app_id = a.id
-            ) AS diff
-        FROM steamtail_app a
-        WHERE
-            a.id != %s
-            AND a.type = 'game'
-            AND a.tag_votes >= 20
-            {}
+                INNER JOIN steamtail_tag g ON g.id = t.tag_id
+                WHERE t.app_id = %(app)s
+                AND g.exclude = false
+            ), excluded_tags AS (
+                SELECT id
+                FROM steamtail_tag
+                WHERE exclude = true
+            )
+            SELECT
+                a.id,
+                a.name,
+                a.review_score,
+                a.coming_soon,
+                a.release_date,
+                a.tag_votes,
+                (
+                    SELECT SUM(ABS(
+                        COALESCE(t.share, 0) - COALESCE(y.share, 0)
+                    ))
+                    FROM steamtail_apptag t
+                    FULL JOIN selected_app_tags y ON y.tag_id = t.tag_id
+                    WHERE t.app_id = a.id
+                    AND (
+                        t IS NULL
+                        OR
+                        NOT EXISTS (SELECT 1 FROM excluded_tags e WHERE e.id = t.tag_id)
+                    )
+                ) AS diff
+            FROM steamtail_app a
+            WHERE
+                a.id != %(app)s
+                AND a.type = 'game'
+                AND a.tag_votes >= 20
+                {}
+        ) AS a
+        WHERE diff IS NOT NULL
         ORDER BY diff ASC
         LIMIT 89
     """.format(
@@ -83,7 +101,7 @@ def apps_like_this(request, pk_a):
         )
         if tag_filters
         else ''
-    ), [app.id, app.id]).prefetch_related(
+    ), {'app': app.id}).prefetch_related(
         'apptag_set',
         'apptag_set__tag',
     )

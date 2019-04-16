@@ -131,6 +131,10 @@ class Tag(models.Model):
         _('tag name'),
         max_length=255,
     )
+    exclude = models.BooleanField(
+        _('exclude from computations'),
+        default=False,
+    )
 
     class Meta:
         ordering = ['name']
@@ -142,6 +146,11 @@ class Tag(models.Model):
 
     def get_absolute_url(self):
         return 'https://store.steampowered.com/tags/en/{}/'.format(self.name)
+
+
+class AppTagManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(tag__exclude=False)
 
 
 class AppTag(models.Model):
@@ -165,6 +174,9 @@ class AppTag(models.Model):
         _('browseable'),
         null=True,
     )
+
+    objects = AppTagManager()
+    unfiltered_objects = models.Manager()
 
     class Meta:
         ordering = ['-votes']
