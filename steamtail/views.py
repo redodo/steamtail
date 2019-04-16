@@ -52,6 +52,7 @@ def apps_like_this(request, pk_a):
     # Retrieves apps that have the least difference in tag makeup
 
     # TODO: add ASC ordering on len(set(app_tags) ^ set(selected_app_tags))
+    #       only add friction for non-included tags in results
     similar_apps = App.objects.raw("""
         SELECT
             *
