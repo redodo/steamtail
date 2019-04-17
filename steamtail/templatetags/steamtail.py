@@ -2,6 +2,7 @@ import urllib
 from hashlib import sha1
 
 from django import template
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -48,6 +49,11 @@ def toggle_param(context, param, value):
 @register.filter
 def select_related(queryset, fields):
     return queryset.select_related(*fields.split(' '))
+
+
+@register.simple_tag(takes_context=True)
+def query(context):
+    return '?' + urllib.parse.urlparse(context.request.get_full_path()).query
 
 
 @register.simple_tag(takes_context=True)

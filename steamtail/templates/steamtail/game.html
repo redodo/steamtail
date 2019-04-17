@@ -1,5 +1,6 @@
 {% load steamtail %}
-<a class="game" href="{% url 'more_like_this' app.id %}"{% if app.diff is not None %} title="{{ app.diff|similarity }}-{{ app.score }}-{{ app.tag_votes }}"{% endif %}>
+{% with tag=tag|default:"a" list_tags=list_tags|default_if_none:True %}
+<{{ tag }} class="game{% if extra %} {{ extra }}{% endif %}"{% if tag == "a" %} href="{% url 'more_like_this' app.id %}{% query %}"{% endif %}{% if app.diff is not None %} title="{{ app.diff|similarity }}-{{ app.score }}-{{ app.tag_votes }}"{% endif %}>
     <div class="game__header">
 
         {% if size == "large" %}
@@ -17,7 +18,6 @@
     </div>
     <div class="game__info">
 
-        {% if not exclude_tags %}
         <div class="game__tags">
             <span href="{{ app.get_absolute_url }}" class="tag {% if size == "small" %} tag--small{% endif %} game__name">{{ app.cleaned_name }}</span>
             {% if app.review_score %}
@@ -46,7 +46,7 @@
             {% endwith %}
             <div class="game__tags-fader"></div>
         </div>
-        {% endif %}
 
     </div>
-</a>
+</{{ tag }}>
+{% endwith %}

@@ -1,7 +1,7 @@
 body {
     margin: 0;
-    padding: 10px;
     box-sizing: border-box;
+    color: white;
     background: #121f2f top center no-repeat;
     font-family: sans-serif;
 }
@@ -10,11 +10,65 @@ body {
     margin: 0 auto;
     width: 1400px;
     max-width: 100%;
+    min-width: 0;
+    display: flex;
+    position: relative;
+    align-items: stretch;
+    align-content: stretch;
+}
+.container__content {
+    flex-grow: 1;
+    min-width: 0;
+    min-height: 100px;
+}
+.container__sidebar {
+    flex: 0;
+    max-width: 240px;
+    min-height: 100px;
+}
+.container__sidebar-sticky {
+    padding: 16px;
+    position: sticky;
+    top: 0;
+}
+
+.list-filter__filter {
+    display: block;
+    font-size: 0.8rem;
+    color: skyblue;
+    opacity: 0.5;
+    text-decoration: none;
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+
+    transition: opacity .1s, box-shadow .03s;
+}
+.list-filter__filter:hover,
+.list-filter__filter:focus {
+    box-shadow: 0 0 0 3px white;
+    opacity: 1;
+    outline: none;
+}
+.list-filter__filter--active {
+    opacity: 1;
+    background: linear-gradient(
+        40deg,
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.1)
+    )
+}
+
+.--muted {
+    color: rgba(255, 255, 160, 0.5);
+    font-weight: normal;
+    opacity: 0.5;
 }
 
 .grid {
     padding: 8px;
     display: flex;
+    min-width: 0;
     flex-wrap: wrap;
     box-sizing: border-box;
 }
@@ -40,6 +94,7 @@ body {
     box-sizing: border-box;
     display: block;
     overflow: hidden;
+    width: 100%;
     box-shadow:
         0 5px 10px 0 rgba(0, 0, 0, 0.2);
     transition: box-shadow 0.1s;
@@ -94,6 +149,11 @@ body {
 .game__name:hover {
     max-width: none;
 }
+.game--wrap .game__name {
+    max-width: 100%;
+    white-space: initial;
+    text-overflow: none;
+}
 .game__tags {
     overflow: hidden;
     white-space: nowrap;
@@ -116,18 +176,20 @@ body {
     right: 0;
     z-index: 200;
 }
-.game:hover, .game:focus {
+.game[href]:hover, .game[href]:focus {
     outline: none;
     box-shadow:
         0 5px 10px 0 rgba(0, 0, 0, 0.2),
         0 0 0 3px white;
 }
 .game:hover .game__tags,
-.game:focus .game__tags {
+.game:focus .game__tags,
+.game--active .game__tags {
     opacity: 1;
 }
 .game:hover .game__name,
-.game:focus .game__name {
+.game:focus .game__name,
+.game--active .game__name {
     color: rgba(255, 255, 255, 1);
 }
 

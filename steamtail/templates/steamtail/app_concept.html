@@ -1,25 +1,37 @@
 {% extends 'steamtail/base.html' %}
-{% load static %}
+{% load static steamtail %}
 {% block head %}
 <link rel="stylesheet" href="{% static 'steamtail/newstyle.css' %}">
 {% endblock %}
 {% block body %}
 <div class="container">
-    <div style="width:25%;margin:0 auto;padding:5px">
-        {% include "steamtail/game.html" with app=app only %}
+    <div class="container__sidebar">
+        <div class="container__sidebar-sticky">
+            {% include "steamtail/game.html" with app=app extra="game--active" tag="div" only %}
+            <h4 class="--muted">Required tags</h4>
+            <div class="list-filter">
+                {% for tag in app.apptag_set.all|to_list %}
+                <a class="list-filter__filter{% if_in_query "tag" tag.tag_id " list-filter__filter--active" %}" href="{% toggle_param "tag" tag.tag_id %}">
+                    {{ tag.tag.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
     </div>
-    <div class="grid">
-        {% for app in app_list %}
-            {% if forloop.counter <= 6 %}
-            <div class="grid__cell grid__cell--1/3">
-                {% include "steamtail/game.html" with app=app only %}
-            </div>
-            {% else %}
-            <div class="grid__cell grid__cell--1/4">
-                {% include "steamtail/game.html" with app=app exclude_name=True size="small" only %}
-            </div>
-            {% endif %}
-        {% endfor %}
+    <div class="container__content">
+        <div class="grid">
+            {% for app in app_list %}
+                {% if forloop.counter <= 6 %}
+                <div class="grid__cell grid__cell--1/3">
+                    {% include "steamtail/game.html" with app=app only %}
+                </div>
+                {% else %}
+                <div class="grid__cell grid__cell--1/4">
+                    {% include "steamtail/game.html" with app=app exclude_name=True size="small" only %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}
